@@ -37,6 +37,12 @@ Database:
 AI:
 - AI APIs for study report generation
 
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
+![Express](https://img.shields.io/badge/Express.js-Framework-black)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-UI-blue)
+![JavaScript](https://img.shields.io/badge/JavaScript-Language-yellow)
+
 ## Features
 
 - Dark themed student dashboard
@@ -65,19 +71,13 @@ AI:
 ![Performance](screenshots/performance_analytics.png)
 
 ### Performance SGPA
-![Performance](screenshots/performance_analytics_sgpa.png)
+![PerformanceSGPA](screenshots/performance_analytics_sgpa.png)
 
 ### Subjects
 ![Subjects](screenshots/subjects_panel.png)
 
 ### Timetable 
 ![Timetable](screenshots/timetable_panel.png)
-
-![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
-![Express](https://img.shields.io/badge/Express.js-Framework-black)
-![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-UI-blue)
-![JavaScript](https://img.shields.io/badge/JavaScript-Language-yellow)
 
 ## System Architecture
 
