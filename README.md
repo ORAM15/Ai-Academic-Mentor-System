@@ -50,16 +50,25 @@ AI:
 ## Screenshots
 
 ### Login Page
-![Login](screenshots/login.png)
+![Login](screenshots/login_page.png)
 
-### Dashboard
-![Dashboard](screenshots/dashboard.png)
+### Home Page
+![Dashboard](screenshots/home_page.png)
 
-### Timetable
-![Timetable](screenshots/timetable.png)
+### Goals 
+![Goals](screenshots/goals_panel.png)
 
 ### Attendance Prediction
-![Attendance](screenshots/attendance.png)
+![Attendance](screenshots/attendance_prediction.png)
 
-### LMS Module
-![LMS](screenshots/lms.png)
+### Performance
+![Performance](screenshots/performance_analytics.png)
+
+### Performance
+![Performance](screenshots/performance_analytics_sgpa.png)
+
+### Subjects
+![Subjects](screenshots/subjects_panel.png)
+
+### Timetable 
+![Timetable](screenshots/timetable_panel.png)
