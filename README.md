@@ -64,7 +64,7 @@ AI:
 ### Performance
 ![Performance](screenshots/performance_analytics.png)
 
-### Performance
+### Performance SGPA
 ![Performance](screenshots/performance_analytics_sgpa.png)
 
 ### Subjects
@@ -72,3 +72,31 @@ AI:
 
 ### Timetable 
 ![Timetable](screenshots/timetable_panel.png)
+
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
+![Express](https://img.shields.io/badge/Express.js-Framework-black)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-UI-blue)
+![JavaScript](https://img.shields.io/badge/JavaScript-Language-yellow)
+
+## System Architecture
+
+Frontend  
+HTML + TailwindCSS + JavaScript  
+
+Backend  
+Node.js + Express.js  
+
+Database  
+MongoDB  
+
+AI Layer  
+AI APIs for academic report generation
+
+## Future Scope
+
+- Mobile application version
+- Integration with official GNDEC student portal
+- Automated attendance syncing
+- Personalized AI study planning
+- Faculty dashboard
