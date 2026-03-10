@@ -70,9 +70,6 @@ AI:
 ### Performance
 ![Performance](screenshots/performance_analytics.png)
 
-### Performance SGPA
-![PerformanceSGPA](screenshots/performance_analytics_sgpa.png)
-
 ### Subjects
 ![Subjects](screenshots/subjects_panel.png)
 
