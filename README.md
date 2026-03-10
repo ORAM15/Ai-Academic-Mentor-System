@@ -1,30 +1,48 @@
 # AI-Based Virtual Academic Mentor System
 
-Minor project for Guru Nanak Dev Engineering College.
+Minor Project for Guru Nanak Dev Engineering College.
 
-## Features
+## Team
+- Oram
+- Gaurav Sood
+- Sumit Kumar
 
-- Student Dashboard
-- Timetable Viewer
-- Attendance Prediction
-- LMS for subjects
-- Academic Analytics
-- AI Study Report
+Supervisor: Pf. Palwinder Kaur
+
+## Description
+This project is a mobile-first academic support system designed for GNDEC students.
+
+It helps students:
+- manage academic goals
+- view timetable
+- track attendance
+- access LMS resources
+- analyze academic performance
+- generate AI-based study reports
 
 ## Tech Stack
 
-Frontend
-HTML
-TailwindCSS
-JavaScript
+Frontend:
+- HTML
+- TailwindCSS
+- JavaScript
 
-Backend
-Node.js
-Express.js
+Backend:
+- Node.js
+- Express.js
 
-Database
-MongoDB
+Database:
+- MongoDB
 
-## Author
+AI:
+- AI APIs for study report generation
 
-Oram
+## Features
+
+- Dark themed student dashboard
+- Timetable viewer
+- Attendance prediction
+- LMS with syllabus and notes
+- Performance analytics
+- Goal tracking
+- AI study report generation
