@@ -46,3 +46,20 @@ AI:
 - Performance analytics
 - Goal tracking
 - AI study report generation
+
+## Screenshots
+
+### Login Page
+![Login](screenshots/login.png)
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Timetable
+![Timetable](screenshots/timetable.png)
+
+### Attendance Prediction
+![Attendance](screenshots/attendance.png)
+
+### LMS Module
+![LMS](screenshots/lms.png)
