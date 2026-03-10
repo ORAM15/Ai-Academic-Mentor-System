@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Timetable - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        purpleDark: '#110a1f',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed top-[-10%] right-[-10%] w-60 h-60 bg-orange-500 rounded-full mix-blend-screen filter blur-[120px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10 flex flex-col h-[calc(100vh-6rem)]">
+        <header class="flex items-center gap-4 mb-6 shrink-0">
+            <h1 class="text-xl font-bold tracking-wide">Timetable D3IT_B2</h1>
+            <div class="ml-auto bg-white/10 px-3 py-1 rounded-full text-xs border border-white/5 flex items-center gap-2">
+                <i class="fa-regular fa-clock text-orange-500"></i> Sem 6
+            </div>
+        </header>
+
+        <div class="flex gap-3 overflow-x-auto hide-scrollbar mb-6 pb-2 shrink-0">
+            <button class="day-btn active px-5 py-2 rounded-full bg-neonPurple text-white text-sm font-medium shadow-[0_4px_15px_rgba(176,38,255,0.4)] transition-all whitespace-nowrap" data-day="monday">Mon</button>
+            <button class="day-btn px-5 py-2 rounded-full bg-white/5 text-gray-400 border border-white/10 text-sm font-medium transition-all whitespace-nowrap" data-day="tuesday">Tue</button>
+            <button class="day-btn px-5 py-2 rounded-full bg-white/5 text-gray-400 border border-white/10 text-sm font-medium transition-all whitespace-nowrap" data-day="wednesday">Wed</button>
+            <button class="day-btn px-5 py-2 rounded-full bg-white/5 text-gray-400 border border-white/10 text-sm font-medium transition-all whitespace-nowrap" data-day="thursday">Thu</button>
+            <button class="day-btn px-5 py-2 rounded-full bg-white/5 text-gray-400 border border-white/10 text-sm font-medium transition-all whitespace-nowrap" data-day="friday">Fri</button>
+        </div>
+
+        <div id="scheduleContainer" class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-4 pb-4 animate-fade-in-up">
+            <div class="text-center text-gray-400 py-10"><i class="fa-solid fa-spinner fa-spin text-2xl"></i> Loading...</div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/timetable.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isDemo = localStorage.getItem('demoMode') === 'true';
+            let scheduleData = null;
+
+            try {
+                if(isDemo) throw "Demo forcing local fallback";
+                scheduleData = await window.api.getTimetable('D3IT_B2');
+            } catch(e) {
+                // Formatting timetable.js to match API structure if local fallback
+                scheduleData = [
+                    { day: 'monday', slots: window.appTimetable.Monday || [] },
+                    { day: 'tuesday', slots: window.appTimetable.Tuesday || [] },
+                    { day: 'wednesday', slots: window.appTimetable.Wednesday || [] },
+                    { day: 'thursday', slots: window.appTimetable.Thursday || [] },
+                    { day: 'friday', slots: window.appTimetable.Friday || [] }
+                ];
+            }
+
+            const container = document.getElementById('scheduleContainer');
+            const btns = document.querySelectorAll('.day-btn');
+            
+            function renderDay(dayKey) {
+                container.innerHTML = '';
+                container.style.opacity = 0;
+                container.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    const dayDoc = scheduleData.find(d => d.day === dayKey);
+                    const classes = dayDoc ? dayDoc.slots : [];
+                    
+                    if(classes.length === 0) {
+                        container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-40 text-gray-500 gap-3">
+                            <i class="fa-regular fa-face-smile text-3xl"></i>
+                            <p>No classes scheduled for today.</p>
+                        </div>`;
+                    } else {
+                        classes.forEach(cls => {
+                            // Assign random status tags for frontend prototype styling if none exists
+                            const statusBadge = '<span class="text-xs text-orange-400"><i class="fa-solid fa-hourglass-half"></i> Upcoming</span>';
+
+                            container.innerHTML += `
+                            <div class="glass-card rounded-2xl p-4 border border-white/10">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex flex-col gap-1">
+                                        <h3 class="font-bold text-lg leading-tight truncate max-w-[200px]">${cls.subjectName || cls.subject}</h3>
+                                    </div>
+                                    <div class="bg-white/5 px-2 py-1 rounded text-xs text-neonPurple border border-neonPurple/20 whitespace-nowrap ml-2">
+                                        ${cls.type}
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-gray-400 mb-3">
+                                    <i class="fa-regular fa-clock w-4"></i>
+                                    <span>${cls.time}</span>
+                                </div>
+                                <div class="flex gap-4 border-t border-white/10 pt-3">
+                                    <div class="flex items-center gap-2 text-xs text-gray-300">
+                                        <i class="fa-solid fa-user-tie text-gray-500"></i> <span class="truncate max-w-[120px]">${cls.professor}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-xs text-gray-300 ml-auto">
+                                        <i class="fa-solid fa-location-dot text-gray-500"></i> ${cls.room}
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        });
+                    }
+                    
+                    void container.offsetWidth;
+                    container.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    container.style.opacity = 1;
+                    container.style.transform = 'translateY(0)';
+                }, 150);
+            }
+
+            // Initial render
+            renderDay('monday');
+
+            btns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    btns.forEach(b => {
+                        b.className = 'day-btn px-5 py-2 rounded-full bg-white/5 text-gray-400 border border-white/10 text-sm font-medium transition-all whitespace-nowrap';
+                    });
+                    e.target.className = 'day-btn active px-5 py-2 rounded-full bg-neonPurple text-white text-sm font-medium shadow-[0_4px_15px_rgba(176,38,255,0.4)] transition-all whitespace-nowrap';
+                    renderDay(e.target.dataset.day);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

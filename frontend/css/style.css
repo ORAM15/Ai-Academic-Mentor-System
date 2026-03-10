@@ -1,0 +1,104 @@
+/* Core Custom CSS and Utilities */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --neon-purple: #b026ff;
+    --teal-high: #00f0ff;
+    --dark-bg: #0a0a0a;
+}
+
+body {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Glassmorphism Classes */
+.glass-card {
+    background: rgba(17, 10, 31, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-nav {
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Gradients */
+.text-gradient {
+    background: linear-gradient(135deg, var(--neon-purple), var(--teal-high));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Animations */
+@keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+}
+.animate-blob {
+    animation: blob 7s infinite;
+}
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Skeleton Shine suitable for buttons */
+.skeleton-shine {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: skewX(-20deg);
+}
+
+/* Scrollbar Hide */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Interactive elements */
+.nav-item {
+    transition: all 0.3s ease;
+}
+.nav-item.active {
+    color: var(--neon-purple);
+}
+.nav-item.active .nav-icon {
+    transform: scale(1.1) translateY(-2px);
+    text-shadow: 0 0 10px rgba(176,38,255,0.5);
+}
+.nav-item.active .nav-indicator {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+/* Generic Utilities */
+.status-green { color: #10b981; }
+.status-yellow { color: #f59e0b; }
+.status-red { color: #ef4444; }
+
+.bg-status-green { background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
+.bg-status-yellow { background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); }
+.bg-status-red { background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }

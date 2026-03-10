@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Goals - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        purpleDark: '#110a1f',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed top-[10%] left-[-10%] w-60 h-60 bg-neonPurple rounded-full mix-blend-screen filter blur-[120px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10 flex flex-col h-full">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-8 shrink-0">
+            <h1 class="text-xl font-bold tracking-wide">Goal Tracking</h1>
+            <div class="bg-white/10 px-3 py-1 rounded-full text-xs border border-white/5 flex items-center gap-2">
+                <span id="progressText" class="font-bold text-tealHigh">0%</span> Done
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden mb-6 border border-white/10 animate-fade-in-up">
+            <div id="progressBar" class="h-full bg-gradient-to-r from-neonPurple to-tealHigh rounded-full shadow-[0_0_10px_rgba(176,38,255,0.4)] transition-all duration-1000 ease-out" style="width: 0%;"></div>
+        </div>
+
+        <div id="tasksContainer" class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-4 pb-4 animate-fade-in-up" style="animation-delay: 0.2s;">
+            <div class="text-center text-gray-400 py-10"><i class="fa-solid fa-spinner fa-spin text-2xl"></i> Loading...</div>
+        </div>
+
+        <!-- Add Goal CTA -->
+        <button onclick="alert('Demo: This would open a modal to add a task to MongoDB');" class="mt-4 w-full bg-white/5 border border-white/20 border-dashed rounded-xl p-4 text-center text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-2 active:scale-95">
+            <i class="fa-solid fa-plus text-xl"></i> Add New Goal
+        </button>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isDemo = localStorage.getItem('demoMode') === 'true';
+            let tasks = [];
+
+            try {
+                if(isDemo) throw "Demo Mode active";
+                tasks = await window.api.getTasks();
+            } catch(e) {
+                // Fallback demo tasks
+                tasks = [
+                    { title: "Complete MEAN Assignment 2", type: "deadline", completed: false },
+                    { title: "Read DevOps Docker module", type: "weekly", completed: false },
+                    { title: "Attend IML extra class", type: "daily", completed: true },
+                    { title: "Review DAA MST-1 Syllabus", type: "weekly", completed: true }
+                ];
+            }
+
+            const container = document.getElementById('tasksContainer');
+            container.innerHTML = '';
+            
+            if(tasks.length === 0) {
+                 container.innerHTML = '<p class="text-gray-500 text-center text-sm py-10">No goals set yet.</p>';
+                 return;
+            }
+
+            let completedCount = 0;
+
+            tasks.forEach(task => {
+                if(task.completed) completedCount++;
+
+                let icon = 'fa-calendar-day';
+                let colorClass = 'text-blue-400';
+                if(task.type === 'weekly') { icon = 'fa-calendar-week'; colorClass = 'text-neonPurple'; }
+                if(task.type === 'deadline') { icon = 'fa-stopwatch'; colorClass = 'text-red-400'; }
+
+                container.innerHTML += `
+                <div class="glass-card rounded-xl p-4 flex items-center justify-between gap-3 active:scale-95 transition-transform ${task.completed ? 'opacity-50' : ''}">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 shrink-0 ${colorClass}">
+                            <i class="fa-solid ${icon}"></i>
+                        </div>
+                        <div class="truncate">
+                            <h4 class="text-sm font-semibold truncate ${task.completed ? 'line-through text-gray-400' : 'text-white'}">${task.title}</h4>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">${task.type}</p>
+                        </div>
+                    </div>
+                    <button class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center shrink-0 ${task.completed ? 'bg-tealHigh text-deep border-tealHigh' : 'bg-transparent text-transparent hover:border-tealHigh hover:text-tealHigh'} transition-all" onclick="this.classList.toggle('bg-tealHigh'); this.classList.toggle('text-deep'); this.classList.toggle('bg-transparent'); this.classList.toggle('text-transparent'); alert('Demo: Toggle Status in MongoDB');">
+                        <i class="fa-solid fa-check text-[10px]"></i>
+                    </button>
+                </div>
+                `;
+            });
+
+            const percentage = Math.round((completedCount / tasks.length) * 100);
+            document.getElementById('progressText').textContent = `${percentage}%`;
+            setTimeout(() => {
+                 document.getElementById('progressBar').style.width = `${percentage}%`;
+            }, 300);
+        });
+    </script>
+</body>
+</html>

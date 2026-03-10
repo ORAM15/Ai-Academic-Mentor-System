@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LMS - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        purpleDark: '#110a1f',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed top-[20%] right-[-20%] w-80 h-80 bg-neonPurple rounded-full mix-blend-screen filter blur-[150px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10 flex flex-col h-full">
+        <!-- Header & Search -->
+        <header class="mb-6 animate-fade-in-up">
+            <h1 class="text-xl font-bold tracking-wide mb-4">LMS / Study Material</h1>
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                <input type="text" placeholder="Search notes, labs, syllabus..." class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 focus:border-transparent transition-all placeholder-gray-500">
+            </div>
+        </header>
+
+        <!-- Folders Grid -->
+        <h3 class="text-sm font-semibold text-gray-400 mb-3 animate-fade-in-up" style="animation-delay: 0.1s;">Sem 6 Subject Folders</h3>
+        <div id="lmsGrid" class="grid grid-cols-2 gap-4 mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">
+            <!-- Rendered by JS -->
+        </div>
+
+        <h3 class="text-sm font-semibold text-gray-400 mb-3 animate-fade-in-up" style="animation-delay: 0.3s;">Recent Material</h3>
+        <div id="recentMaterials" class="flex flex-col gap-3 animate-fade-in-up" style="animation-delay: 0.4s;">
+            <!-- Placeholder for uploaded files to be parsed soon -->
+            <p class="text-xs text-gray-500 italic mt-2">Upload syllabus PDFs to parse content automatically...</p>
+        </div>
+
+        <!-- Floating Action Button -->
+        <button class="fixed bottom-24 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-neonPurple to-tealHigh flex items-center justify-center shadow-[0_4px_20px_rgba(176,38,255,0.5)] z-40 active:scale-95 transition-transform hover:scale-105">
+            <i class="fa-solid fa-cloud-arrow-up text-xl text-white"></i>
+        </button>
+    </div>
+
+    <!-- The original Notes page has been replaced by LMS as per user constraint -->
+    <script src="js/api.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lmsData = window.appData.lms;
+            const grid = document.getElementById("lmsGrid");
+            
+            const icons = [ "text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]", "text-neonPurple drop-shadow-[0_0_8px_rgba(176,38,255,0.5)]", "text-tealHigh drop-shadow-[0_0_8px_rgba(0,240,255,0.5)]", "text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" ];
+
+            let i = 0;
+            for(let key in lmsData) {
+                const totalFiles = lmsData[key].notes.length + lmsData[key].labs.length + (lmsData[key].syllabus ? 1 : 0);
+                const color = icons[i % icons.length];
+                
+                grid.innerHTML += `
+                <div class="glass-card rounded-xl p-4 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform cursor-pointer text-center">
+                    <i class="fa-solid fa-folder text-4xl ${color} mb-1"></i>
+                    <h4 class="font-medium text-[11px] leading-tight line-clamp-2 h-8 flex items-center justify-center">${key}</h4>
+                    <p class="text-[10px] text-gray-400">${totalFiles} Files</p>
+                </div>`;
+                i++;
+            }
+        });
+    </script>
+</body>
+</html>

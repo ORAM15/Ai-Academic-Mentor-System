@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Performance Analytics - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        purpleDark: '#110a1f',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed top-[30%] left-[-10%] w-60 h-60 bg-neonPurple rounded-full mix-blend-screen filter blur-[150px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10">
+        <!-- Header -->
+        <header class="flex items-center gap-4 mb-8">
+            <h1 class="text-xl font-bold tracking-wide">Performance Analytics</h1>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="glass-card rounded-2xl p-4 animate-fade-in-up">
+                <p class="text-gray-400 text-xs mb-1">Overall Performace</p>
+                <div class="flex items-end gap-2">
+                    <h2 class="text-3xl font-bold text-gradient" id="overallScore">84%</h2>
+                    <i class="fa-solid fa-arrow-trend-up text-green-500 mb-1 text-sm"></i>
+                </div>
+            </div>
+            <div class="glass-card rounded-2xl p-4 animate-fade-in-up" style="animation-delay: 0.1s;">
+                <p class="text-gray-400 text-xs mb-1">Total Exams</p>
+                <div class="flex items-end gap-2">
+                    <h2 class="text-3xl font-bold text-white">6</h2>
+                    <i class="fa-solid fa-check-circle text-teal-500 mb-1 text-sm"></i>
+                </div>
+            </div>
+            <div class="glass-card rounded-2xl p-4 animate-fade-in-up col-span-2 flex items-center justify-between">
+                <div>
+                     <p class="text-gray-400 text-xs mb-1">Class Rank</p>
+                     <h2 class="text-xl font-bold text-white">Top 15%</h2>
+                </div>
+                <button id="aiReportBtn" class="bg-gradient-to-r from-neonPurple to-tealHigh text-white text-xs font-bold px-4 py-2 rounded-xl shadow-[0_0_15px_rgba(176,38,255,0.4)] active:scale-95 transition-transform flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Report
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Report Modal UI -->
+        <div id="aiModal" class="hidden glass-card rounded-xl p-4 mb-8 border-l-4 border-l-tealHigh animate-fade-in-up">
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-tealHigh/20 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-robot text-tealHigh"></i>
+                </div>
+                <div class="w-full">
+                    <h4 class="text-sm font-bold text-tealHigh mb-1">AI Study Report</h4>
+                    <p class="text-xs text-gray-300 mb-2 leading-relaxed" id="aiProductivity"></p>
+                    <p class="text-xs text-gray-300 mb-2 leading-relaxed font-semibold">Recommendations:</p>
+                    <ul class="text-xs text-gray-300 list-disc pl-4 space-y-1" id="aiSuggestions"></ul>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.2s;">Subject Scores (MST-1)</h3>
+        <div class="glass-card rounded-3xl p-5 mb-8 animate-fade-in-up" style="animation-delay: 0.3s;">
+            <canvas id="barChart"></canvas>
+        </div>
+
+        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.4s;">CGPA Trend</h3>
+        <div class="glass-card rounded-3xl p-5 mb-8 animate-fade-in-up" style="animation-delay: 0.5s;">
+            <canvas id="lineChart"></canvas>
+        </div>
+
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+            Chart.defaults.font.family = 'Poppins';
+            
+            // Bar Chart
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['MEAN', 'DAA', 'IML', 'DevOps', 'OB', 'PMM'],
+                    datasets: [{
+                        label: 'MST-1 Score (out of 30)',
+                        data: [25, 22, 28, 20, 18, 26],
+                        backgroundColor: 'rgba(176, 38, 255, 0.7)',
+                        borderColor: '#b026ff',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 30, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Line Chart
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            const gradient = ctxLine.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.5)');
+            gradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
+
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6 (Est)'],
+                    datasets: [{
+                        label: 'CGPA',
+                        data: [7.8, 8.1, 7.9, 8.4, 8.6, 8.4],
+                        borderColor: '#00f0ff',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#00f0ff',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { min: 6.0, max: 10.0, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // AI Report Logic
+            const aiBtn = document.getElementById('aiReportBtn');
+            const aiModal = document.getElementById('aiModal');
+            
+            aiBtn.addEventListener('click', async () => {
+                aiBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+                try {
+                    const isDemo = localStorage.getItem('demoMode') === 'true';
+                    let report;
+                    if(isDemo) {
+                         // Mocking delay
+                         await new Promise(r => setTimeout(r, 1500));
+                         report = {
+                              weeklySuggestions: ["Focus on DevOps Lab practicals this week.", "Review DAA algorithms before MSTs."],
+                              productivity: "You are currently maintaining a solid attendance rate. Task completion rate is good.",
+                              improvement: "Consider spending 30m extra daily to improve grades."
+                         };
+                    } else {
+                         report = await window.api.generateReport({ context: 'analytics view' });
+                    }
+                    
+                    document.getElementById('aiProductivity').textContent = report.productivity + ' ' + report.improvement;
+                    const ul = document.getElementById('aiSuggestions');
+                    ul.innerHTML = '';
+                    report.weeklySuggestions.forEach(s => {
+                        ul.innerHTML += `<li>${s}</li>`;
+                    });
+
+                    aiModal.classList.remove('hidden');
+                    aiBtn.innerHTML = '<i class="fa-solid fa-check"></i> Generated';
+                } catch(e) {
+                    aiBtn.innerHTML = 'Error';
+                    console.error(e);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

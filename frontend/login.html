@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Academic Mentor - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        purpleDark: '#110a1f',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen flex items-center justify-center relative overflow-hidden font-sans">
+    <div class="absolute top-[-10%] left-[-10%] w-64 h-64 bg-neonPurple rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-72 h-72 bg-tealHigh rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob animation-delay-2000"></div>
+
+    <div class="glass-card w-[90%] max-w-md p-8 rounded-3xl z-10 animate-fade-in-up relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-tealHigh to-neonPurple"></div>
+        
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 mb-4 shadow-[0_0_15px_rgba(176,38,255,0.3)]">
+                <i class="fa-solid fa-graduation-cap text-3xl text-gradient"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">Virtual Mentor</h1>
+            <p class="text-sm text-gray-400 mt-1">GNDEC Academic Resource</p>
+        </div>
+
+        <form id="loginForm" class="space-y-5">
+            <p id="errorMsg" class="text-red-500 text-xs text-center hidden mb-2"></p>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Student ID</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fa-regular fa-id-badge text-gray-500"></i>
+                    </div>
+                    <input type="text" id="studentId" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. 2100000" required>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-lock text-gray-500"></i>
+                    </div>
+                    <input type="password" id="password" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 focus:border-transparent transition-all placeholder-gray-600" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <div class="pt-4 space-y-3">
+                <button type="submit" id="submitBtn" class="w-full relative group overflow-hidden rounded-xl bg-gradient-to-r from-neonPurple to-indigo-600 text-white font-medium py-3 shadow-[0_4px_15px_rgba(176,38,255,0.4)] transition-all hover:shadow-[0_4px_25px_rgba(176,38,255,0.6)] hover:scale-[1.02]">
+                    <span class="relative flex items-center justify-center gap-2">
+                        Login <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </span>
+                </button>
+                
+                <button type="button" id="demoBtn" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium py-3 rounded-xl transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bolt text-tealHigh"></i> Continue as Demo Local
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- The user explicitly mentioned keeping data.js logic for local demo persistence as a fallback -->
+    <!-- So we load data.js but primarily use api.js if backend is reachable -->
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('demoBtn').addEventListener('click', () => {
+            // Native fallback login
+            localStorage.setItem('demoMode', 'true');
+            window.location.href = 'dashboard.html';
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const sid = document.getElementById('studentId').value;
+            const pwd = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+            const err = document.getElementById('errorMsg');
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+            
+            try {
+                // Try backend API integration
+                await window.api.login(sid, pwd);
+                localStorage.removeItem('demoMode');
+                window.location.href = 'dashboard.html';
+            } catch(e) {
+                // Network error or invalid
+                console.warn("Backend login failed, using demo fallback if match.", e);
+                // Demo fallback check
+                if(sid === '2100000' && pwd === 'password123') {
+                     localStorage.setItem('demoMode', 'true');
+                     window.location.href = 'dashboard.html';
+                } else {
+                     err.textContent = "Invalid credentials. Run local server or use demo.";
+                     err.classList.remove('hidden');
+                     btn.innerHTML = '<span class="relative flex items-center justify-center gap-2">Login <i class="fa-solid fa-arrow-right text-xs"></i></span>';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

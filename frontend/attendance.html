@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Attendance Prediction - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        purpleDark: '#110a1f',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed top-[10%] left-[-10%] w-60 h-60 bg-neonPurple rounded-full mix-blend-screen filter blur-[120px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10">
+        <!-- Header -->
+        <header class="flex items-center gap-4 mb-8">
+            <h1 class="text-xl font-bold tracking-wide">Attendance AI</h1>
+        </header>
+
+        <!-- Main Circular Graph -->
+        <div class="glass-card rounded-3xl p-6 mb-8 flex flex-col items-center relative animate-fade-in-up">
+            <div class="absolute top-4 right-4 bg-white/10 px-3 py-1 rounded-full text-xs font-medium border border-white/5 flex items-center gap-1">
+                <i class="fa-solid fa-wand-magic-sparkles text-neonPurple"></i> Trend Prediction
+            </div>
+            
+            <div class="relative w-48 h-48 mt-4 mb-2 flex items-center justify-center">
+                <!-- SVG Circle -->
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"></circle>
+                    <circle id="attendanceCircle" cx="50" cy="50" r="45" fill="none" stroke="url(#gradient)" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="283" stroke-linecap="round" class="transition-all duration-1000 ease-out"></circle>
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#b026ff" />
+                            <stop offset="100%" stop-color="#00f0ff" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center text-center">
+                    <span class="text-4xl font-bold text-gradient" id="overallPerc">0%</span>
+                    <span class="text-xs text-gray-400 mt-1">Overall Present</span>
+                </div>
+            </div>
+
+            <p class="text-center text-sm text-gray-300 px-4 mt-2">
+                "Maintaining this rate, your expected attendance by end of semester is <span class="text-neonPurple font-semibold" id="predictedPerc">0%</span>."
+            </p>
+            
+            <!-- Slider -->
+            <div class="w-full mt-6">
+                <div class="flex justify-between text-xs text-gray-400 mb-2">
+                    <span>Miss next 5</span>
+                    <span>Current</span>
+                    <span>Attend all 5</span>
+                </div>
+                <!-- Sliders for prediction -->
+                <input type="range" id="attendanceSlider" min="-5" max="5" value="0" class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-neonPurple">
+                <p class="text-xs text-center text-tealHigh mt-3" id="sliderFeedback">Select scenario to see AI prediction</p>
+                <style>
+                    #attendanceSlider::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background: #00f0ff;
+                        box-shadow: 0 0 10px rgba(0,240,255,0.7);
+                        cursor: pointer;
+                    }
+                </style>
+            </div>
+        </div>
+
+        <!-- Subject Wise List -->
+        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.1s;">Subject-wise Details</h3>
+        <div class="flex flex-col gap-4 animate-fade-in-up" style="animation-delay: 0.2s;" id="subjectsList">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isDemo = localStorage.getItem('demoMode') === 'true';
+            
+            let data;
+            if(isDemo) {
+                 data = window.appData.attendance;
+            } else {
+                 try {
+                     const dashResponse = await window.api.getDashboard();
+                     data = dashResponse.attendance;
+                 } catch(e) {
+                     console.error("Dashboard fetch failed, falling back to local demo", e);
+                     data = window.appData.attendance;
+                 }
+            }
+
+            const currentOverall = parseFloat(data.overall);
+            
+            const circle = document.getElementById('attendanceCircle');
+            const circumference = 2 * Math.PI * 45; // ~282.7
+            
+            function updateCircle(percentage) {
+                percentage = Math.max(0, Math.min(100, percentage));
+                const offset = circumference - (percentage / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+            }
+            
+            circle.style.strokeDasharray = `${circumference}`;
+            setTimeout(() => { updateCircle(currentOverall); }, 100);
+            
+            document.getElementById('overallPerc').textContent = `${currentOverall}%`;
+            document.getElementById('predictedPerc').textContent = `${(currentOverall + 2).toFixed(1)}%`;
+
+            // Slider Logic
+            const slider = document.getElementById('attendanceSlider');
+            const feedback = document.getElementById('sliderFeedback');
+            const overallText = document.getElementById('overallPerc');
+            
+            slider.addEventListener('input', (e) => {
+                const val = parseInt(e.target.value);
+                const newPerc = currentOverall + (val * 1.5); // Simple math for mock prediction
+                const finalPerc = Math.max(0, Math.min(100, newPerc));
+                
+                overallText.textContent = `${finalPerc.toFixed(1)}%`;
+                updateCircle(finalPerc);
+
+                if(val === 0) feedback.textContent = "Current Trajectory";
+                else if(val > 0) feedback.textContent = `Prediction if you attend next ${val} classes`;
+                else feedback.textContent = `Prediction if you miss next ${Math.abs(val)} classes`;
+            });
+
+            // Populate Subjects
+            const list = document.getElementById('subjectsList');
+            list.innerHTML = '';
+            
+            data.subjects.forEach(sub => {
+                let barColor = 'bg-green-500';
+                let iconColor = 'text-green-500 bg-green-500/10 border-green-500/20 shadow-[0_0_10px_rgba(16,185,129,0.3)]';
+                let iconClass = 'fa-check';
+                
+                if(sub.status === 'warning') {
+                    barColor = 'bg-yellow-500';
+                    iconColor = 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20 shadow-[0_0_10px_rgba(245,158,11,0.3)]';
+                    iconClass = 'fa-exclamation';
+                } else if(sub.status === 'critical') {
+                    barColor = 'bg-red-500';
+                    iconColor = 'text-red-500 bg-red-500/10 border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.3)]';
+                    iconClass = 'fa-xmark';
+                }
+
+                list.innerHTML += `
+                <div class="glass-card rounded-xl p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full border flex items-center justify-center ${iconColor}">
+                                <i class="fa-solid ${iconClass} text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold">${sub.name || sub.subject}</h4>
+                                <p class="text-xs text-gray-400">${sub.attended}/${sub.total} Classes Attended</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold min-w-[40px] text-right ${sub.status === 'critical' ? 'text-red-500' : ''}">${sub.percentage}%</span>
+                    </div>
+                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                        <div class="h-full ${barColor} rounded-full" style="width: ${sub.percentage}%;"></div>
+                    </div>
+                </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
