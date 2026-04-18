@@ -1,62 +1,63 @@
-// Make components generic enough for both modes
-// Inject navbar, replacing bottom Nav HTML to include 'Subjects' where 'Attendance' was if needed, or keeping it the same.
-// The prompt asked for: Login, Dashboard, Subjects, Timetable, Attendance, Performance, LMS.
-// Our bottom nav only fits 5 items perfectly. 
-// Dashboard, Timetable, Subjects, Performance, LMS 
-// We will replace "Notes" with LMS, and maybe move Attendance inside Performance or Dashboard. 
-
+// Bottom Navigation with all new features
 function createBottomNav(activePage = 'home') {
     const navHTML = `
-    <nav class="glass-nav fixed bottom-0 left-0 w-full px-4 py-4 rounded-t-3xl z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-        <ul class="flex justify-between items-center relative">
-            <li>
-                <a href="dashboard.html" class="nav-item flex flex-col items-center gap-1 ${activePage === 'home' ? 'active' : 'text-gray-500 hover:text-white'}">
-                    <i class="fa-solid fa-house nav-icon text-xl transition-all"></i>
-                    <span class="text-[10px] font-medium">Home</span>
-                    <div class="nav-indicator h-1 w-full bg-neonPurple rounded-t-md absolute bottom-[-16px] transition-all opacity-0 ${activePage === 'home' ? 'opacity-100 scale-x-100' : 'scale-x-0'}"></div>
-                </a>
-            </li>
-            <li>
-                <a href="timetable.html" class="nav-item flex flex-col items-center gap-1 ${activePage === 'timetable' ? 'active' : 'text-gray-500 hover:text-white'}">
-                    <i class="fa-solid fa-calendar nav-icon text-xl transition-all"></i>
-                    <span class="text-[10px] font-medium">Schedule</span>
-                    <div class="nav-indicator h-1 w-full bg-neonPurple rounded-t-md absolute bottom-[-16px] transition-all opacity-0 ${activePage === 'timetable' ? 'opacity-100 scale-x-100' : 'scale-x-0'}"></div>
-                </a>
-            </li>
-            <li>
-                <!-- FAB center button -->
-                <a href="attendance.html" class="relative -top-6 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-tr from-neonPurple to-tealHigh shadow-[0_4px_20px_rgba(0,240,255,0.4)] text-white hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-chart-pie text-2xl"></i>
-                </a>
-            </li>
-            <li>
-                <a href="tasks.html" class="nav-item flex flex-col items-center gap-1 ${activePage === 'tasks' ? 'active' : 'text-gray-500 hover:text-white'}">
-                    <i class="fa-solid fa-bullseye nav-icon text-xl transition-all"></i>
-                    <span class="text-[10px] font-medium">Goals</span>
-                    <div class="nav-indicator h-1 w-full bg-neonPurple rounded-t-md absolute bottom-[-16px] transition-all opacity-0 ${activePage === 'tasks' ? 'opacity-100 scale-x-100' : 'scale-x-0'}"></div>
-                </a>
-            </li>
-            <li>
-                <a href="performance.html" class="nav-item flex flex-col items-center gap-1 ${activePage === 'performance' ? 'active' : 'text-gray-500 hover:text-white'}">
-                    <i class="fa-solid fa-chart-line nav-icon text-xl transition-all"></i>
-                    <span class="text-[10px] font-medium">Analytics</span>
-                    <div class="nav-indicator h-1 w-full bg-neonPurple rounded-t-md absolute bottom-[-16px] transition-all opacity-0 ${activePage === 'performance' ? 'opacity-100 scale-x-100' : 'scale-x-0'}"></div>
-                </a>
-            </li>
-        </ul>
+    <nav class="glass-nav fixed bottom-0 left-0 w-full px-2 py-3 rounded-t-3xl z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div class="flex justify-center gap-1 overflow-x-auto hide-scrollbar">
+            <a href="dashboard.html" class="nav-item flex flex-col items-center gap-1 px-3 py-2 ${activePage === 'home' ? 'text-neonPurple' : 'text-gray-500 hover:text-white'} transition-all">
+                <i class="fa-solid fa-house nav-icon text-lg"></i>
+                <span class="text-[9px] font-medium whitespace-nowrap">Home</span>
+            </a>
+            <a href="subjects.html" class="nav-item flex flex-col items-center gap-1 px-3 py-2 ${activePage === 'subjects' ? 'text-neonPurple' : 'text-gray-500 hover:text-white'} transition-all">
+                <i class="fa-solid fa-book nav-icon text-lg"></i>
+                <span class="text-[9px] font-medium whitespace-nowrap">Subjects</span>
+            </a>
+            <a href="attendance.html" class="nav-item flex flex-col items-center gap-1 px-3 py-2 ${activePage === 'attendance' ? 'text-neonPurple' : 'text-gray-500 hover:text-white'} transition-all">
+                <i class="fa-solid fa-chart-pie nav-icon text-lg"></i>
+                <span class="text-[9px] font-medium whitespace-nowrap">Attend</span>
+            </a>
+            <a href="tasks.html" class="nav-item flex flex-col items-center gap-1 px-3 py-2 ${activePage === 'tasks' ? 'text-neonPurple' : 'text-gray-500 hover:text-white'} transition-all">
+                <i class="fa-solid fa-circle-check nav-icon text-lg"></i>
+                <span class="text-[9px] font-medium whitespace-nowrap">Goals</span>
+            </a>
+            <a href="notes.html" class="nav-item flex flex-col items-center gap-1 px-3 py-2 ${activePage === 'notes' ? 'text-neonPurple' : 'text-gray-500 hover:text-white'} transition-all">
+                <i class="fa-solid fa-note-sticky nav-icon text-lg"></i>
+                <span class="text-[9px] font-medium whitespace-nowrap">Notes</span>
+            </a>
+            <a href="analytics.html" class="nav-item flex flex-col items-center gap-1 px-3 py-2 ${activePage === 'analytics' ? 'text-neonPurple' : 'text-gray-500 hover:text-white'} transition-all">
+                <i class="fa-solid fa-chart-line nav-icon text-lg"></i>
+                <span class="text-[9px] font-medium whitespace-nowrap">Analytics</span>
+            </a>
+            <a href="achievements.html" class="nav-item flex flex-col items-center gap-1 px-3 py-2 ${activePage === 'achievements' ? 'text-neonPurple' : 'text-gray-500 hover:text-white'} transition-all">
+                <i class="fa-solid fa-trophy nav-icon text-lg"></i>
+                <span class="text-[9px] font-medium whitespace-nowrap">Achieve</span>
+            </a>
+            <a href="resources.html" class="nav-item flex flex-col items-center gap-1 px-3 py-2 ${activePage === 'resources' ? 'text-neonPurple' : 'text-gray-500 hover:text-white'} transition-all">
+                <i class="fa-solid fa-book-open nav-icon text-lg"></i>
+                <span class="text-[9px] font-medium whitespace-nowrap">Resources</span>
+            </a>
+        </div>
     </nav>
     <div class="h-24"></div> 
     `;
     return navHTML;
 }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-    if (!window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('/')) {
+    if (!window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('register.html') && !window.location.pathname.endsWith('/')) {
         let currentPage = 'home';
-        if(window.location.pathname.includes('timetable')) currentPage = 'timetable';
-        if(window.location.pathname.includes('attendance')) currentPage = 'attendance';
-        if(window.location.pathname.includes('tasks')) currentPage = 'tasks';
-        if(window.location.pathname.includes('performance')) currentPage = 'performance';
+        const path = window.location.pathname.toLowerCase();
+        
+        if(path.includes('subjects')) currentPage = 'subjects';
+        if(path.includes('timetable')) currentPage = 'timetable';
+        if(path.includes('attendance')) currentPage = 'attendance';
+        if(path.includes('tasks')) currentPage = 'tasks';
+        if(path.includes('notes')) currentPage = 'notes';
+        if(path.includes('analytics')) currentPage = 'analytics';
+        if(path.includes('achievements')) currentPage = 'achievements';
+        if(path.includes('resources')) currentPage = 'resources';
+        if(path.includes('performance')) currentPage = 'performance';
+        if(path.includes('dashboard')) currentPage = 'home';
         
         const navContainer = document.createElement('div');
         navContainer.innerHTML = createBottomNav(currentPage);

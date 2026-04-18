@@ -5,10 +5,36 @@
     --neon-purple: #b026ff;
     --teal-high: #00f0ff;
     --dark-bg: #0a0a0a;
+    --light-bg: #ffffff;
+    --light-text: #1a1a1a;
+}
+
+/* Dark Mode Variables */
+body.light-mode {
+    --dark-bg: #f5f5f5;
+    --light-bg: #ffffff;
+    --light-text: #1a1a1a;
+}
+
+body.dark-mode {
+    --dark-bg: #0a0a0a;
+    --light-bg: #ffffff;
+    --light-text: #ffffff;
 }
 
 body {
     -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.3s ease;
+}
+
+body.light-mode {
+    background-color: #f5f5f5;
+    color: #1a1a1a;
+}
+
+body.dark-mode {
+    background-color: #0a0a0a;
+    color: #ffffff;
 }
 
 /* Glassmorphism Classes */
@@ -18,6 +44,13 @@ body {
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease;
+}
+
+body.light-mode .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .glass-nav {
@@ -25,6 +58,11 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.light-mode .glass-nav {
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* Gradients */
@@ -63,6 +101,28 @@ body {
     animation: fadeInUp 0.6s ease-out forwards;
 }
 
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+.animate-slide-in {
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+.animate-pulse-glow {
+    animation: pulse 2s ease-in-out infinite;
+}
+
 /* Skeleton Shine suitable for buttons */
 .skeleton-shine {
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
@@ -98,6 +158,87 @@ body {
 .status-green { color: #10b981; }
 .status-yellow { color: #f59e0b; }
 .status-red { color: #ef4444; }
+
+/* Achievement Badge Styles */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 28px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(176, 38, 255, 0.4);
+}
+
+.badge.unlocked {
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 15px rgba(176, 38, 255, 0.5);
+}
+
+.badge.locked {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+/* Progress Ring */
+.progress-ring {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}
+
+.progress-ring-circle {
+    transition: stroke-dashoffset 0.35s;
+    stroke-dasharray: 283;
+    stroke-dashoffset: 0;
+}
+
+/* Modal styles */
+.modal-overlay {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+/* Timer Styles */
+.timer-display {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+}
+
+/* Notification Toast */
+.toast-notification {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Stats Card */
+.stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--neon-purple), var(--teal-high));
+}
 
 .bg-status-green { background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
 .bg-status-yellow { background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); }

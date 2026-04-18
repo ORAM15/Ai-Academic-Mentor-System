@@ -29,38 +29,106 @@
     <div class="fixed bottom-[20%] left-[-10%] w-60 h-60 bg-tealHigh rounded-full mix-blend-screen filter blur-[100px] opacity-20 z-0 pointer-events-none"></div>
 
     <div class="relative z-10 px-6 pt-10">
-        <!-- Header -->
+        <!-- Header with Dark Mode Toggle -->
         <header class="flex justify-between items-center mb-8 animate-fade-in-up">
             <div>
                 <p class="text-sm text-gray-400">Welcome back,</p>
                 <h1 class="text-2xl font-bold" id="studentName">Student</h1>
                 <p class="text-xs text-neonPurple mt-1" id="studentBranch">Branch</p>
             </div>
-            <div class="relative" onclick="window.api.logout()">
-                <img id="profileImg" src="" alt="Profile" class="w-12 h-12 rounded-full border-2 border-neonPurple/50 shadow-[0_0_15px_rgba(176,38,255,0.3)]">
-                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-deep"></div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleDarkMode()" id="themeToggle" class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all" title="Toggle theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button onclick="window.api.logout()" class="relative cursor-pointer">
+                    <img id="profileImg" src="" alt="Profile" class="w-12 h-12 rounded-full border-2 border-neonPurple/50 shadow-[0_0_15px_rgba(176,38,255,0.3)]">
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-deep"></div>
+                </button>
             </div>
         </header>
 
-        <!-- Summary Widget -->
-        <div class="glass-card rounded-2xl p-5 mb-6 animate-fade-in-up" style="animation-delay: 0.1s;">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-gray-400 text-xs mb-1">Current CGPA</p>
-                    <h2 class="text-3xl font-bold text-gradient" id="studentCGPA">0.0</h2>
-                </div>
-                <div class="h-12 w-[1px] bg-white/10"></div>
-                <div>
-                    <p class="text-gray-400 text-xs mb-1">Overall Attendance</p>
-                    <h2 class="text-3xl font-bold text-white flex items-baseline gap-1" id="overallAttendance">0<span class="text-sm text-gray-400">%</span></h2>
-                </div>
+        <!-- Summary Widgets -->
+        <div class="grid grid-cols-2 gap-3 mb-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+            <div class="glass-card stat-card rounded-xl p-4">
+                <p class="text-gray-400 text-xs mb-1">Current CGPA</p>
+                <h2 class="text-2xl font-bold text-gradient" id="studentCGPA">0.0</h2>
+            </div>
+            <div class="glass-card stat-card rounded-xl p-4">
+                <p class="text-gray-400 text-xs mb-1">Overall Attendance</p>
+                <h2 class="text-2xl font-bold text-tealHigh" id="overallAttendance">0%</h2>
+            </div>
+            <div class="glass-card stat-card rounded-xl p-4">
+                <p class="text-gray-400 text-xs mb-1">Study Hours (This Week)</p>
+                <h2 class="text-2xl font-bold text-green-400" id="studyHours">0h</h2>
+            </div>
+            <div class="glass-card stat-card rounded-xl p-4">
+                <p class="text-gray-400 text-xs mb-1">Tasks Completed</p>
+                <h2 class="text-2xl font-bold text-yellow-400" id="tasksCompleted">0</h2>
             </div>
         </div>
 
-        <!-- Quick Actions Grid -->
-        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.2s;">Quick Overview</h3>
+        <!-- Study Timer Section -->
+        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.15s;">Quick Study Session</h3>
+        <div class="glass-card rounded-2xl p-6 mb-6 animate-fade-in-up text-center" style="animation-delay: 0.2s;">
+            <div class="mb-4">
+                <p class="text-sm text-gray-400 mb-2">Focus Time</p>
+                <div class="text-5xl font-bold timer-display text-gradient mb-4">
+                    <span id="timerDisplay">25:00</span>
+                </div>
+            </div>
+            <div class="flex gap-2 justify-center flex-wrap">
+                <button onclick="startTimer(25)" class="px-4 py-2 bg-neonPurple/20 border border-neonPurple/50 rounded-lg text-xs font-medium hover:bg-neonPurple/30 transition-all">25 min</button>
+                <button onclick="startTimer(45)" class="px-4 py-2 bg-tealHigh/20 border border-tealHigh/50 rounded-lg text-xs font-medium hover:bg-tealHigh/30 transition-all">45 min</button>
+                <button onclick="startTimer(60)" class="px-4 py-2 bg-yellow-400/20 border border-yellow-400/50 rounded-lg text-xs font-medium hover:bg-yellow-400/30 transition-all">1 hour</button>
+                <button onclick="stopTimer()" class="px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-lg text-xs font-medium hover:bg-red-500/30 transition-all">Stop</button>
+            </div>
+        </div>
+
+        <!-- Navigation to New Features -->
+        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.25s;">New Features</h3>
         <div class="grid grid-cols-2 gap-4 mb-6 animate-fade-in-up" style="animation-delay: 0.3s;">
-            <a href="subjects.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform cursor-pointer block">
+            <a href="analytics.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform">
+                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-sm">Analytics</p>
+                    <p class="text-xs text-gray-400">Performance Insights</p>
+                </div>
+            </a>
+            <a href="notes.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform">
+                <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400">
+                    <i class="fa-solid fa-note-sticky"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-sm">Notes</p>
+                    <p class="text-xs text-gray-400">Study Notes</p>
+                </div>
+            </a>
+            <a href="achievements.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform">
+                <div class="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-sm">Achievements</p>
+                    <p class="text-xs text-gray-400">Badges & XP</p>
+                </div>
+            </a>
+            <a href="resources.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform">
+                <div class="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400">
+                    <i class="fa-solid fa-book"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-sm">Resources</p>
+                    <p class="text-xs text-gray-400">Learning Materials</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Quick Actions -->
+        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.35s;">Quick Overview</h3>
+        <div class="grid grid-cols-2 gap-4 mb-6 animate-fade-in-up" style="animation-delay: 0.4s;">
+            <a href="subjects.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform">
                 <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
                     <i class="fa-solid fa-book-open"></i>
                 </div>
@@ -69,7 +137,7 @@
                     <p class="text-xs text-gray-400">Semester View</p>
                 </div>
             </a>
-            <a href="attendance.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform cursor-pointer block">
+            <a href="attendance.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform">
                 <div class="w-8 h-8 rounded-full bg-tealHigh/20 flex items-center justify-center text-tealHigh">
                     <i class="fa-solid fa-chart-pie"></i>
                 </div>
@@ -78,7 +146,7 @@
                     <p class="text-xs text-gray-400">View Status</p>
                 </div>
             </a>
-            <a href="timetable.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform cursor-pointer block">
+            <a href="timetable.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform">
                 <div class="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
                     <i class="fa-regular fa-calendar"></i>
                 </div>
@@ -87,16 +155,51 @@
                     <p class="text-xs text-gray-400">Classes & MSTs</p>
                 </div>
             </a>
-            <div class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform cursor-pointer">
+            <a href="tasks.html" class="glass-card rounded-xl p-4 flex flex-col gap-3 active:scale-95 transition-transform">
                 <div class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-500">
-                    <i class="fa-solid fa-file-invoice"></i>
+                    <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div>
-                    <p class="font-medium text-sm">Leaves</p>
-                    <p class="text-xs text-gray-400">Apply & Status</p>
+                    <p class="font-medium text-sm">Goals</p>
+                    <p class="text-xs text-gray-400">Track Tasks</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Live Class Card -->
+        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.45s;">Next Live Class</h3>
+        <div class="glass-card rounded-2xl p-5 relative overflow-hidden animate-fade-in-up" style="animation-delay: 0.5s;">
+            <div class="absolute top-0 left-0 w-1 h-full bg-tealHigh shadow-[0_0_10px_#00f0ff]"></div>
+            <div class="flex justify-between items-start mb-3 ml-2">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-tealHigh animate-pulse"></span>
+                        <span class="text-xs font-medium text-tealHigh uppercase tracking-wider">Live Now</span>
+                    </div>
+                    <h4 class="text-lg font-bold" id="liveSubject">Loading...</h4>
+                </div>
+                <div class="bg-white/10 px-3 py-1 rounded-full text-xs border border-white/5" id="liveTime">
+                    --:--
+                </div>
+            </div>
+            <div class="ml-2 flex flex-col gap-2 mt-4 text-sm text-gray-300">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-user-tie w-4 text-center text-gray-500"></i>
+                    <span id="liveProf">--</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-location-dot w-4 text-center text-gray-500"></i>
+                    <span id="liveRoom">--</span>
                 </div>
             </div>
         </div>
+
+        <!-- Subjects List Snippet -->
+        <h3 class="text-lg font-semibold mb-4 mt-6 animate-fade-in-up" style="animation-delay: 0.6s;">My Subjects</h3>
+        <div id="subjects" class="flex flex-col gap-3 animate-fade-in-up" style="animation-delay: 0.7s;">
+            <!-- Populated by JS -->
+        </div>
+    </div>
 
         <!-- Live Class Card -->
         <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.4s;">Next Live Class</h3>
@@ -135,14 +238,72 @@
 
     <script src="js/api.js"></script>
     <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
     <script src="js/main.js"></script>
     <script>
+        let timerInterval = null;
+        let timerSeconds = 0;
+
+        function toggleDarkMode() {
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            localStorage.setItem('darkMode', !isDark);
+            applyTheme();
+        }
+
+        function applyTheme() {
+            const isDark = localStorage.getItem('darkMode') !== 'false';
+            const btn = document.getElementById('themeToggle');
+            if(isDark) {
+                document.body.classList.add('dark-mode');
+                document.body.classList.remove('light-mode');
+                btn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            } else {
+                document.body.classList.add('light-mode');
+                document.body.classList.remove('dark-mode');
+                btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+            }
+        }
+
+        function startTimer(minutes) {
+            if(timerInterval) clearInterval(timerInterval);
+            timerSeconds = minutes * 60;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+                if(timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert('⏰ Study session complete! Great work!');
+                    timerSeconds = 0;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if(timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                timerSeconds = 0;
+                updateTimerDisplay();
+            }
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
+            applyTheme();
+            
             const isDemo = localStorage.getItem('demoMode') === 'true';
             
             let data;
             if(isDemo) {
-                 // Format data.js correctly to mimic API response structure
                  data = { 
                      student: window.appData.student, 
                      attendance: window.appData.attendance 
@@ -163,16 +324,21 @@
             if(data.student.profileImg) document.getElementById('profileImg').src = data.student.profileImg;
             
             // Attendance
-            document.getElementById('overallAttendance').innerHTML = `${data.attendance.overall}<span class="text-sm text-gray-400">%</span>`;
+            document.getElementById('overallAttendance').textContent = data.attendance.overall + '%';
             
-            // Live Class Check (Simulated for Demo based on current day)
-            // Hardcoding Devops as per prompt explicitly requiring DevOps live card
+            // Additional stats
+            const studyHours = (Math.random() * 15 + 5).toFixed(1);
+            const tasksCompleted = Math.floor(Math.random() * 25 + 5);
+            document.getElementById('studyHours').textContent = studyHours + 'h';
+            document.getElementById('tasksCompleted').textContent = tasksCompleted;
+            
+            // Live Class
             document.getElementById('liveSubject').textContent = "DevOps Lab";
             document.getElementById('liveTime').textContent = "09:30 - 10:20";
             document.getElementById('liveProf').textContent = "Pf. Himani Sharma";
             document.getElementById('liveRoom').textContent = "PL Lab";
 
-            // Render subjects directly on Dashboard (from data.js snippet)
+            // Render subjects
             const subjectsList = document.getElementById("subjects");
             if(subjectsList && window.appData && window.appData.subjects) {
                 window.appData.subjects.forEach(subject => {

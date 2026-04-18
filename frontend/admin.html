@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Teacher Portal - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        purpleDark: '#110a1f',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden">
+    <div class="fixed top-[10%] left-[-10%] w-60 h-60 bg-neonPurple rounded-full mix-blend-screen filter blur-[120px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10">
+        <!-- Header -->
+        <header class="flex items-center justify-between px-6 pt-6 pb-4">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-bold tracking-wide">Teacher Portal</h1>
+                <div class="bg-white/10 px-3 py-1 rounded-full text-xs font-medium border border-white/5">
+                    <i class="fa-solid fa-chalkboard-teacher text-neonPurple mr-1"></i> Admin Mode
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-400" id="teacherName">Loading...</span>
+                <button onclick="logout()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-sign-out-alt text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="px-6 mb-6">
+            <div class="flex gap-2 overflow-x-auto pb-2" id="navTabs">
+                <button onclick="switchTab('dashboard')" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium bg-neonPurple/20 text-neonPurple border border-neonPurple/30">
+                    <i class="fa-solid fa-chart-line mr-2"></i>Dashboard
+                </button>
+                <button onclick="switchTab('students')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-gray-400 border border-white/10">
+                    <i class="fa-solid fa-users mr-2"></i>Students
+                </button>
+                <button onclick="switchTab('attendance')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-gray-400 border border-white/10">
+                    <i class="fa-solid fa-calendar-check mr-2"></i>Attendance
+                </button>
+                <button onclick="switchTab('notes')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-gray-400 border border-white/10">
+                    <i class="fa-solid fa-book mr-2"></i>Notes
+                </button>
+                <button onclick="switchTab('resources')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-gray-400 border border-white/10">
+                    <i class="fa-solid fa-folder mr-2"></i>Resources
+                </button>
+                <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-gray-400 border border-white/10">
+                    <i class="fa-solid fa-chart-bar mr-2"></i>Analytics
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="px-6 pb-24">
+
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="tab-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Total Students</p>
+                                <p class="text-2xl font-bold text-tealHigh" id="totalStudents">0</p>
+                            </div>
+                            <i class="fa-solid fa-users text-2xl text-neonPurple"></i>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Avg Attendance</p>
+                                <p class="text-2xl font-bold text-green-400" id="avgAttendance">0%</p>
+                            </div>
+                            <i class="fa-solid fa-chart-pie text-2xl text-green-400"></i>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Active Notes</p>
+                                <p class="text-2xl font-bold text-yellow-400" id="activeNotes">0</p>
+                            </div>
+                            <i class="fa-solid fa-book-open text-2xl text-yellow-400"></i>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Resources</p>
+                                <p class="text-2xl font-bold text-purple-400" id="totalResources">0</p>
+                            </div>
+                            <i class="fa-solid fa-folder-open text-2xl text-purple-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
+                        <div id="recentActivity" class="space-y-3">
+                            <!-- Activity items will be populated here -->
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="switchTab('attendance')" class="bg-neonPurple/20 hover:bg-neonPurple/30 border border-neonPurple/30 rounded-lg p-3 text-left transition-all">
+                                <i class="fa-solid fa-plus text-neonPurple mb-2"></i>
+                                <p class="text-sm font-medium">Update Attendance</p>
+                            </button>
+                            <button onclick="switchTab('notes')" class="bg-tealHigh/20 hover:bg-tealHigh/30 border border-tealHigh/30 rounded-lg p-3 text-left transition-all">
+                                <i class="fa-solid fa-upload text-tealHigh mb-2"></i>
+                                <p class="text-sm font-medium">Upload Notes</p>
+                            </button>
+                            <button onclick="switchTab('resources')" class="bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 rounded-lg p-3 text-left transition-all">
+                                <i class="fa-solid fa-file text-green-500 mb-2"></i>
+                                <p class="text-sm font-medium">Add Resources</p>
+                            </button>
+                            <button onclick="switchTab('students')" class="bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/30 rounded-lg p-3 text-left transition-all">
+                                <i class="fa-solid fa-user-plus text-yellow-500 mb-2"></i>
+                                <p class="text-sm font-medium">Manage Students</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="studentsTab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">Student Management</h2>
+                    <button onclick="showAddStudentModal()" class="bg-neonPurple hover:bg-neonPurple/80 rounded-lg px-4 py-2 text-sm font-medium transition-all">
+                        <i class="fa-solid fa-plus mr-2"></i>Add Student
+                    </button>
+                </div>
+                <div class="glass-card rounded-xl p-6">
+                    <div class="mb-4 flex gap-4">
+                        <input type="text" id="studentSearch" placeholder="Search students..." class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm flex-1">
+                        <select id="studentFilter" class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm">
+                            <option value="all">All Students</option>
+                            <option value="active">Active Only</option>
+                            <option value="low-attendance">Low Attendance</option>
+                        </select>
+                    </div>
+                    <div id="studentsList" class="space-y-3">
+                        <!-- Students will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Tab -->
+            <div id="attendanceTab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">Attendance Management</h2>
+                    <button onclick="showBulkAttendanceModal()" class="bg-tealHigh hover:bg-tealHigh/80 rounded-lg px-4 py-2 text-sm font-medium transition-all">
+                        <i class="fa-solid fa-calendar-plus mr-2"></i>Bulk Update
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Subject-wise Update</h3>
+                        <div class="space-y-3" id="subjectAttendanceList">
+                            <!-- Subject attendance options -->
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Recent Updates</h3>
+                        <div id="attendanceHistory" class="space-y-3">
+                            <!-- Attendance history -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes Tab -->
+            <div id="notesTab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">Notes Management</h2>
+                    <button onclick="showUploadNotesModal()" class="bg-green-500 hover:bg-green-500/80 rounded-lg px-4 py-2 text-sm font-medium transition-all">
+                        <i class="fa-solid fa-upload mr-2"></i>Upload Notes
+                    </button>
+                </div>
+                <div class="glass-card rounded-xl p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="notesGrid">
+                        <!-- Notes will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources Tab -->
+            <div id="resourcesTab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">Resource Library</h2>
+                    <button onclick="showAddResourceModal()" class="bg-purple-500 hover:bg-purple-500/80 rounded-lg px-4 py-2 text-sm font-medium transition-all">
+                        <i class="fa-solid fa-plus mr-2"></i>Add Resource
+                    </button>
+                </div>
+                <div class="glass-card rounded-xl p-6">
+                    <div class="mb-4 flex gap-4">
+                        <select id="resourceTypeFilter" class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm">
+                            <option value="all">All Types</option>
+                            <option value="video">Videos</option>
+                            <option value="document">Documents</option>
+                            <option value="link">Links</option>
+                        </select>
+                        <select id="resourceSubjectFilter" class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm">
+                            <option value="all">All Subjects</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="resourcesGrid">
+                        <!-- Resources will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analyticsTab" class="tab-content hidden">
+                <h2 class="text-xl font-bold mb-6">Analytics Dashboard</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Attendance Trends</h3>
+                        <canvas id="attendanceChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Subject Performance</h3>
+                        <canvas id="subjectChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modals will be added here -->
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let currentTab = 'dashboard';
+        let teacherData = null;
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-neonPurple/20', 'text-neonPurple', 'border-neonPurple/30');
+                btn.classList.add('bg-white/5', 'text-gray-400', 'border-white/10');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+            event.target.classList.add('active', 'bg-neonPurple/20', 'text-neonPurple', 'border-neonPurple/30');
+            event.target.classList.remove('bg-white/5', 'text-gray-400', 'border-white/10');
+
+            currentTab = tabName;
+            loadTabData(tabName);
+        }
+
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'students':
+                    loadStudentsData();
+                    break;
+                case 'attendance':
+                    loadAttendanceData();
+                    break;
+                case 'notes':
+                    loadNotesData();
+                    break;
+                case 'resources':
+                    loadResourcesData();
+                    break;
+                case 'analytics':
+                    loadAnalyticsData();
+                    break;
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                const response = await window.api.getTeacherDashboard();
+                document.getElementById('totalStudents').textContent = response.totalStudents || 0;
+                document.getElementById('avgAttendance').textContent = response.avgAttendance + '%' || '0%';
+                document.getElementById('activeNotes').textContent = response.activeNotes || 0;
+                document.getElementById('totalResources').textContent = response.totalResources || 0;
+
+                // Load recent activity
+                const activityHtml = response.recentActivity?.map(activity => `
+                    <div class="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
+                        <i class="fa-solid ${activity.icon} text-${activity.color}-400"></i>
+                        <div class="flex-1">
+                            <p class="text-sm">${activity.message}</p>
+                            <p class="text-xs text-gray-400">${activity.time}</p>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-gray-400 text-sm">No recent activity</p>';
+                document.getElementById('recentActivity').innerHTML = activityHtml;
+            } catch(e) {
+                console.error('Dashboard load failed:', e);
+                // Fallback to demo data
+                document.getElementById('totalStudents').textContent = '156';
+                document.getElementById('avgAttendance').textContent = '78%';
+                document.getElementById('activeNotes').textContent = '24';
+                document.getElementById('totalResources').textContent = '42';
+            }
+        }
+
+        function loadStudentsData() {
+            // Implementation for students tab
+            document.getElementById('studentsList').innerHTML = '<p class="text-gray-400">Loading students...</p>';
+        }
+
+        function loadAttendanceData() {
+            // Implementation for attendance tab
+            document.getElementById('subjectAttendanceList').innerHTML = '<p class="text-gray-400">Loading subjects...</p>';
+        }
+
+        function loadNotesData() {
+            // Implementation for notes tab
+            document.getElementById('notesGrid').innerHTML = '<p class="text-gray-400">Loading notes...</p>';
+        }
+
+        function loadResourcesData() {
+            // Implementation for resources tab
+            document.getElementById('resourcesGrid').innerHTML = '<p class="text-gray-400">Loading resources...</p>';
+        }
+
+        function loadAnalyticsData() {
+            // Implementation for analytics tab
+            // Chart.js implementation would go here
+        }
+
+        // Modal functions (placeholders)
+        function showAddStudentModal() { /* TODO */ }
+        function showBulkAttendanceModal() { /* TODO */ }
+        function showUploadNotesModal() { /* TODO */ }
+        function showAddResourceModal() { /* TODO */ }
+
+        function logout() {
+            localStorage.removeItem('teacherToken');
+            localStorage.removeItem('demoTeacherMode');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('teacherToken');
+            const demoMode = localStorage.getItem('demoTeacherMode') === 'true';
+
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            if (demoMode) {
+                teacherData = { teacherId: 'T001', name: 'Demo Teacher', email: 'demo@mentor.local' };
+                document.getElementById('teacherName').textContent = teacherData.name;
+                loadDashboardData();
+                return;
+            }
+
+            try {
+                const response = await window.api.getTeacherProfile();
+                teacherData = response;
+                document.getElementById('teacherName').textContent = response.name;
+                loadDashboardData();
+            } catch(e) {
+                console.error('Teacher auth failed:', e);
+                logout();
+            }
+        });
+    </script>
+</body>
+</html>

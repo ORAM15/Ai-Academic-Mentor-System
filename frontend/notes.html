@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Notes - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed top-[-20%] right-[-10%] w-72 h-72 bg-neonPurple rounded-full mix-blend-screen filter blur-[120px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-xl font-bold tracking-wide">Study Notes</h1>
+            <button onclick="openNoteModal()" class="w-10 h-10 rounded-full bg-gradient-to-r from-neonPurple to-indigo-600 flex items-center justify-center hover:shadow-[0_0_15px_rgba(176,38,255,0.4)]">
+                <i class="fa-solid fa-plus text-sm"></i>
+            </button>
+        </header>
+
+        <div class="mb-4 flex gap-2 flex-wrap">
+            <button onclick="filterNotes('all')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all active-filter">All</button>
+            <button onclick="filterNotes('favorites')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all">Favorites</button>
+            <button onclick="filterNotes('recent')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all">Recent</button>
+        </div>
+
+        <div id="notesList" class="flex flex-col gap-3">
+            <div class="text-center text-gray-400 py-10"><i class="fa-solid fa-spinner fa-spin text-2xl"></i> Loading notes...</div>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="noteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-card rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold">New Note</h2>
+                <button onclick="closeNoteModal()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="noteForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Subject</label>
+                    <select id="noteSubject" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white" required>
+                        <option value="">Select a subject</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Title</label>
+                    <input type="text" id="noteTitle" placeholder="e.g., REST API concepts" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white placeholder-gray-600" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Content</label>
+                    <textarea id="noteContent" placeholder="Write your notes here..." rows="6" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white placeholder-gray-600 resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeNoteModal()" class="flex-1 bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm font-medium hover:bg-white/10">Cancel</button>
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-neonPurple to-indigo-600 rounded-lg py-2 px-4 text-sm font-medium hover:shadow-[0_0_15px_rgba(176,38,255,0.4)]">Save Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        let allNotes = [];
+        let currentFilter = 'all';
+
+        function openNoteModal() {
+            document.getElementById('noteModal').classList.remove('hidden');
+            document.getElementById('noteTitle').focus();
+            populateSubjectSelect();
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.add('hidden');
+            document.getElementById('noteForm').reset();
+        }
+
+        function populateSubjectSelect() {
+            const select = document.getElementById('noteSubject');
+            if(!select.querySelector('option[value!=""]')) {
+                window.appData.subjects.forEach(sub => {
+                    const opt = document.createElement('option');
+                    opt.value = sub.name;
+                    opt.textContent = sub.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function filterNotes(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.flex.gap-2 button').forEach(btn => btn.classList.remove('active-filter'));
+            event.target.classList.add('active-filter');
+            renderNotes();
+        }
+
+        function renderNotes() {
+            const container = document.getElementById('notesList');
+            let filtered = allNotes;
+
+            if(currentFilter === 'favorites') {
+                filtered = allNotes.filter(n => n.favorite);
+            } else if(currentFilter === 'recent') {
+                filtered = allNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            if(filtered.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center text-sm py-10">No notes yet. Create your first note!</p>';
+                return;
+            }
+
+            container.innerHTML = filtered.map((note, idx) => `
+                <div class="glass-card rounded-xl p-4 animate-slide-in">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-semibold text-white">${note.title}</h3>
+                            <p class="text-xs text-gray-400">${note.subject}</p>
+                        </div>
+                        <button onclick="toggleFavorite(${idx})" class="text-lg ${note.favorite ? 'text-yellow-400' : 'text-gray-500 hover:text-yellow-400'}">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-3 line-clamp-2">${note.content}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] text-gray-500">${new Date(note.date).toLocaleDateString()}</span>
+                        <button onclick="deleteNote(${idx})" class="text-xs text-red-400 hover:text-red-300">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleFavorite(idx) {
+            allNotes[idx].favorite = !allNotes[idx].favorite;
+            localStorage.setItem('notes', JSON.stringify(allNotes));
+            renderNotes();
+        }
+
+        function deleteNote(idx) {
+            if(confirm('Delete this note?')) {
+                allNotes.splice(idx, 1);
+                localStorage.setItem('notes', JSON.stringify(allNotes));
+                renderNotes();
+            }
+        }
+
+        document.getElementById('noteForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newNote = {
+                id: Date.now(),
+                subject: document.getElementById('noteSubject').value,
+                title: document.getElementById('noteTitle').value,
+                content: document.getElementById('noteContent').value,
+                date: new Date().toISOString(),
+                favorite: false
+            };
+            allNotes.unshift(newNote);
+            localStorage.setItem('notes', JSON.stringify(allNotes));
+            renderNotes();
+            closeNoteModal();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('notes');
+            if(saved) {
+                allNotes = JSON.parse(saved);
+            } else {
+                allNotes = [
+                    { id: 1, subject: 'MEAN Fullstack Development', title: 'REST API Basics', content: 'GET, POST, PUT, DELETE methods. Status codes: 200 OK, 201 Created, 400 Bad Request, 404 Not Found, 500 Server Error.', date: new Date().toISOString(), favorite: false },
+                    { id: 2, subject: 'DevOps', title: 'Docker Concepts', content: 'Containers are lightweight VMs. Docker images are blueprints. Dockerfile defines the image. docker run creates containers.', date: new Date(Date.now() - 86400000).toISOString(), favorite: true },
+                ];
+                localStorage.setItem('notes', JSON.stringify(allNotes));
+            }
+            renderNotes();
+        });
+
+        document.getElementById('noteModal').addEventListener('click', (e) => {
+            if(e.target.id === 'noteModal') closeNoteModal();
+        });
+    </script>
+</body>
+</html>

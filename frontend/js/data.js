@@ -78,4 +78,59 @@ const lms = {
   }
 };
 
-window.appData = { student, subjects, lms };
+// Attendance Prediction Data with AI-generated random values
+const attendance = {
+  overall: 78,
+  subjects: [
+    {
+      name: "MEAN Fullstack Development",
+      subject: "MEAN Fullstack Development",
+      attended: 28,
+      total: 36,
+      percentage: 78,
+      status: "safe"
+    },
+    {
+      name: "Design and Analysis of Algorithms",
+      subject: "Design and Analysis of Algorithms",
+      attended: 35,
+      total: 36,
+      percentage: 97,
+      status: "safe"
+    },
+    {
+      name: "Introduction to Machine Learning",
+      subject: "Introduction to Machine Learning",
+      attended: 24,
+      total: 36,
+      percentage: 67,
+      status: "warning"
+    },
+    {
+      name: "DevOps",
+      subject: "DevOps",
+      attended: 22,
+      total: 36,
+      percentage: 61,
+      status: "critical"
+    },
+    {
+      name: "Organizational Behavior",
+      subject: "Organizational Behavior",
+      attended: 32,
+      total: 36,
+      percentage: 89,
+      status: "safe"
+    },
+    {
+      name: "Project Management and Marketing",
+      subject: "Project Management and Marketing",
+      attended: 26,
+      total: 36,
+      percentage: 72,
+      status: "warning"
+    }
+  ]
+};
+
+window.appData = { student, subjects, lms, attendance };

@@ -46,14 +46,68 @@
         </div>
 
         <!-- Add Goal CTA -->
-        <button onclick="alert('Demo: This would open a modal to add a task to MongoDB');" class="mt-4 w-full bg-white/5 border border-white/20 border-dashed rounded-xl p-4 text-center text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-2 active:scale-95">
+        <button onclick="openAddTaskModal()" class="mt-4 w-full bg-white/5 border border-white/20 border-dashed rounded-xl p-4 text-center text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-2 active:scale-95">
             <i class="fa-solid fa-plus text-xl"></i> Add New Goal
         </button>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="taskModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-card rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold">Add New Goal</h2>
+                <button onclick="closeAddTaskModal()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="addTaskForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Goal Title</label>
+                    <input type="text" id="taskTitle" placeholder="e.g., Complete MEAN Assignment" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white placeholder-gray-600" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Goal Type</label>
+                    <select id="taskType" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="deadline">Deadline</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeAddTaskModal()" class="flex-1 bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm font-medium hover:bg-white/10 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-neonPurple to-indigo-600 rounded-lg py-2 px-4 text-sm font-medium hover:shadow-[0_0_15px_rgba(176,38,255,0.4)] transition-all">
+                        Add Goal
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
+        function openAddTaskModal() {
+            document.getElementById('taskModal').classList.remove('hidden');
+            document.getElementById('taskTitle').focus();
+        }
+
+        function closeAddTaskModal() {
+            document.getElementById('taskModal').classList.add('hidden');
+            document.getElementById('addTaskForm').reset();
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('taskModal').addEventListener('click', (e) => {
+                if(e.target.id === 'taskModal') closeAddTaskModal();
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', async () => {
             const isDemo = localStorage.getItem('demoMode') === 'true';
             let tasks = [];
@@ -64,54 +118,114 @@
             } catch(e) {
                 // Fallback demo tasks
                 tasks = [
-                    { title: "Complete MEAN Assignment 2", type: "deadline", completed: false },
-                    { title: "Read DevOps Docker module", type: "weekly", completed: false },
-                    { title: "Attend IML extra class", type: "daily", completed: true },
-                    { title: "Review DAA MST-1 Syllabus", type: "weekly", completed: true }
+                    { id: 1, title: "Complete MEAN Assignment 2", type: "deadline", completed: false },
+                    { id: 2, title: "Read DevOps Docker module", type: "weekly", completed: false },
+                    { id: 3, title: "Attend IML extra class", type: "daily", completed: true },
+                    { id: 4, title: "Review DAA MST-1 Syllabus", type: "weekly", completed: true }
                 ];
+                // Load from localStorage if available
+                const savedTasks = localStorage.getItem('demoTasks');
+                if(savedTasks) {
+                    try {
+                        tasks = JSON.parse(savedTasks);
+                    } catch(e) {
+                        console.log("Could not parse saved tasks");
+                    }
+                }
             }
 
-            const container = document.getElementById('tasksContainer');
-            container.innerHTML = '';
-            
-            if(tasks.length === 0) {
-                 container.innerHTML = '<p class="text-gray-500 text-center text-sm py-10">No goals set yet.</p>';
-                 return;
+            function saveTasks() {
+                if(isDemo) {
+                    localStorage.setItem('demoTasks', JSON.stringify(tasks));
+                }
             }
 
-            let completedCount = 0;
+            function renderTasks() {
+                const container = document.getElementById('tasksContainer');
+                container.innerHTML = '';
+                
+                if(tasks.length === 0) {
+                     container.innerHTML = '<p class="text-gray-500 text-center text-sm py-10">No goals set yet.</p>';
+                     return;
+                }
 
-            tasks.forEach(task => {
-                if(task.completed) completedCount++;
+                let completedCount = 0;
 
-                let icon = 'fa-calendar-day';
-                let colorClass = 'text-blue-400';
-                if(task.type === 'weekly') { icon = 'fa-calendar-week'; colorClass = 'text-neonPurple'; }
-                if(task.type === 'deadline') { icon = 'fa-stopwatch'; colorClass = 'text-red-400'; }
+                tasks.forEach((task, index) => {
+                    if(task.completed) completedCount++;
 
-                container.innerHTML += `
-                <div class="glass-card rounded-xl p-4 flex items-center justify-between gap-3 active:scale-95 transition-transform ${task.completed ? 'opacity-50' : ''}">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 shrink-0 ${colorClass}">
-                            <i class="fa-solid ${icon}"></i>
+                    let icon = 'fa-calendar-day';
+                    let colorClass = 'text-blue-400';
+                    if(task.type === 'weekly') { icon = 'fa-calendar-week'; colorClass = 'text-neonPurple'; }
+                    if(task.type === 'deadline') { icon = 'fa-stopwatch'; colorClass = 'text-red-400'; }
+
+                    container.innerHTML += `
+                    <div class="glass-card rounded-xl p-4 flex items-center justify-between gap-3 active:scale-95 transition-transform ${task.completed ? 'opacity-50' : ''}">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 shrink-0 ${colorClass}">
+                                <i class="fa-solid ${icon}"></i>
+                            </div>
+                            <div class="truncate">
+                                <h4 class="text-sm font-semibold truncate ${task.completed ? 'line-through text-gray-400' : 'text-white'}">${task.title}</h4>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">${task.type}</p>
+                            </div>
                         </div>
-                        <div class="truncate">
-                            <h4 class="text-sm font-semibold truncate ${task.completed ? 'line-through text-gray-400' : 'text-white'}">${task.title}</h4>
-                            <p class="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">${task.type}</p>
+                        <div class="flex gap-2 shrink-0">
+                            <button class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center ${task.completed ? 'bg-tealHigh text-deep border-tealHigh' : 'bg-transparent text-transparent hover:border-tealHigh hover:text-tealHigh'} transition-all" onclick="toggleTask(${index})">
+                                <i class="fa-solid fa-check text-[10px]"></i>
+                            </button>
+                            <button class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center text-red-400/50 hover:text-red-400 hover:border-red-400 transition-all" onclick="deleteTask(${index})">
+                                <i class="fa-solid fa-trash text-[10px]"></i>
+                            </button>
                         </div>
                     </div>
-                    <button class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center shrink-0 ${task.completed ? 'bg-tealHigh text-deep border-tealHigh' : 'bg-transparent text-transparent hover:border-tealHigh hover:text-tealHigh'} transition-all" onclick="this.classList.toggle('bg-tealHigh'); this.classList.toggle('text-deep'); this.classList.toggle('bg-transparent'); this.classList.toggle('text-transparent'); alert('Demo: Toggle Status in MongoDB');">
-                        <i class="fa-solid fa-check text-[10px]"></i>
-                    </button>
-                </div>
-                `;
-            });
+                    `;
+                });
 
-            const percentage = Math.round((completedCount / tasks.length) * 100);
-            document.getElementById('progressText').textContent = `${percentage}%`;
-            setTimeout(() => {
-                 document.getElementById('progressBar').style.width = `${percentage}%`;
-            }, 300);
+                const percentage = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+                document.getElementById('progressText').textContent = `${percentage}%`;
+                setTimeout(() => {
+                     document.getElementById('progressBar').style.width = `${percentage}%`;
+                }, 300);
+            }
+
+            window.toggleTask = (index) => {
+                tasks[index].completed = !tasks[index].completed;
+                saveTasks();
+                renderTasks();
+            };
+
+            window.deleteTask = (index) => {
+                if(confirm('Delete this goal?')) {
+                    tasks.splice(index, 1);
+                    saveTasks();
+                    renderTasks();
+                }
+            };
+
+            // Initial render
+            renderTasks();
+
+            // Handle form submission
+            document.getElementById('addTaskForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('taskTitle').value.trim();
+                const type = document.getElementById('taskType').value;
+
+                if(!title) return;
+
+                const newTask = {
+                    id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id || 0)) + 1 : 1,
+                    title: title,
+                    type: type,
+                    completed: false
+                };
+
+                tasks.push(newTask);
+                saveTasks();
+                renderTasks();
+                closeAddTaskModal();
+            });
         });
     </script>
 </body>

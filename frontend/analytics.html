@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed top-[10%] left-[-10%] w-60 h-60 bg-neonPurple rounded-full mix-blend-screen filter blur-[120px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold tracking-wide mb-2">Performance Analytics</h1>
+            <p class="text-sm text-gray-400">Detailed insights into your academic performance</p>
+        </header>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="glass-card stat-card rounded-xl p-4">
+                <p class="text-xs text-gray-400 mb-1">Avg Attendance</p>
+                <h3 class="text-2xl font-bold text-tealHigh" id="avgAttendance">78%</h3>
+            </div>
+            <div class="glass-card stat-card rounded-xl p-4">
+                <p class="text-xs text-gray-400 mb-1">Current CGPA</p>
+                <h3 class="text-2xl font-bold text-neonPurple" id="currentCGPA">6.02</h3>
+            </div>
+            <div class="glass-card stat-card rounded-xl p-4">
+                <p class="text-xs text-gray-400 mb-1">Study Hours</p>
+                <h3 class="text-2xl font-bold text-green-400" id="studyHours">42.5</h3>
+            </div>
+            <div class="glass-card stat-card rounded-xl p-4">
+                <p class="text-xs text-gray-400 mb-1">Tasks Done</p>
+                <h3 class="text-2xl font-bold text-yellow-400" id="tasksDone">18</h3>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <h3 class="text-lg font-semibold mb-4">Subject-wise Performance</h3>
+        <div class="glass-card rounded-xl p-4 mb-8">
+            <div style="position: relative; height: 300px;">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Attendance Trend -->
+        <h3 class="text-lg font-semibold mb-4">Attendance Trend (Last 8 Weeks)</h3>
+        <div class="glass-card rounded-xl p-4 mb-8">
+            <div style="position: relative; height: 250px;">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Time Spent Distribution -->
+        <h3 class="text-lg font-semibold mb-4">Study Time Distribution</h3>
+        <div class="glass-card rounded-xl p-4 mb-8">
+            <div style="position: relative; height: 300px;">
+                <canvas id="timeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Detailed Subject Stats -->
+        <h3 class="text-lg font-semibold mb-4">Subject Details</h3>
+        <div id="subjectStats" class="flex flex-col gap-3">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const attendance = window.appData.attendance;
+            const subjects = window.appData.subjects;
+
+            // Update stats
+            document.getElementById('avgAttendance').textContent = attendance.overall + '%';
+            document.getElementById('currentCGPA').textContent = window.appData.student.cgpa;
+            document.getElementById('studyHours').textContent = (Math.random() * 50 + 20).toFixed(1);
+            document.getElementById('tasksDone').textContent = Math.floor(Math.random() * 30 + 10);
+
+            // Performance Chart
+            const perfCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(perfCtx, {
+                type: 'bar',
+                data: {
+                    labels: attendance.subjects.map(s => s.name.substring(0, 15) + '...'),
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: attendance.subjects.map(s => s.percentage),
+                        backgroundColor: [
+                            'rgba(176, 38, 255, 0.5)',
+                            'rgba(0, 240, 255, 0.5)',
+                            'rgba(239, 68, 68, 0.5)',
+                            'rgba(34, 197, 94, 0.5)',
+                            'rgba(251, 146, 60, 0.5)',
+                            'rgba(168, 85, 247, 0.5)'
+                        ],
+                        borderColor: [
+                            '#b026ff',
+                            '#00f0ff',
+                            '#ef4444',
+                            '#22c55e',
+                            '#fb923c',
+                            '#a855f7'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Attendance Trend Chart
+            const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'];
+            const attendTrend = [70, 72, 75, 76, 78, 77, 78, 78];
+            const attCtx = document.getElementById('attendanceChart').getContext('2d');
+            new Chart(attCtx, {
+                type: 'line',
+                data: {
+                    labels: weeks,
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: attendTrend,
+                        borderColor: '#00f0ff',
+                        backgroundColor: 'rgba(0, 240, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#00f0ff',
+                        pointBorderColor: '#0a0a0a',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af' } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Time Distribution (Pie Chart)
+            const timeCtx = document.getElementById('timeChart').getContext('2d');
+            const subNames = attendance.subjects.slice(0, 4).map(s => s.name.substring(0, 12));
+            new Chart(timeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: subNames,
+                    datasets: [{
+                        data: [15, 18, 12, 8],
+                        backgroundColor: ['#b026ff', '#00f0ff', '#ef4444', '#22c55e'],
+                        borderColor: '#0a0a0a',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#9ca3af' }
+                        }
+                    }
+                }
+            });
+
+            // Subject Stats Table
+            const statsDiv = document.getElementById('subjectStats');
+            statsDiv.innerHTML = attendance.subjects.map((sub, idx) => {
+                const color = sub.status === 'critical' ? 'text-red-400' : sub.status === 'warning' ? 'text-yellow-400' : 'text-green-400';
+                return `
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-semibold">${sub.name}</h4>
+                            <span class="text-sm font-bold ${color}">${sub.percentage}%</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-400 mb-2">
+                            <span>${sub.attended}/${sub.total} classes</span>
+                            <span>${((sub.attended / sub.total) * 100).toFixed(1)}% present</span>
+                        </div>
+                        <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                            <div class="h-full ${sub.status === 'critical' ? 'bg-red-500' : sub.status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'}" style="width: ${sub.percentage}%;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        });
+    </script>
+</body>
+</html>
