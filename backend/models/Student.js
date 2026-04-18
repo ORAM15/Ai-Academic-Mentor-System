@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const studentSchema = new mongoose.Schema({
   studentId: { type: String, required: true, unique: true },
-  password: { type: String, required: true }, // Simple string for demo
-  name: { type: String, required: true },
-  branch: { type: String, required: true },
-  semester: { type: Number, required: true },
-  cgpa: { type: Number, required: true },
+  password: { type: String, required: true },
+  name:     { type: String, required: true },
+  branch:   { type: String, default: '' },   // ← optional
+  semester: { type: Number, default: 0 },    // ← optional
+  cgpa:     { type: Number, default: 0 },    // ← optional
   profileImg: { type: String }
 });
 

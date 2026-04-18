@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed bottom-[20%] left-[-10%] w-60 h-60 bg-tealHigh rounded-full mix-blend-screen filter blur-[100px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold tracking-wide mb-2">Achievements</h1>
+            <p class="text-sm text-gray-400">Unlock badges and milestones</p>
+        </header>
+
+        <!-- XP Progress -->
+        <div class="glass-card rounded-xl p-4 mb-8">
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <p class="text-xs text-gray-400 mb-1">Total XP</p>
+                    <h3 class="text-3xl font-bold text-gradient" id="totalXP">0</h3>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-400 mb-1">Level</p>
+                    <h3 class="text-3xl font-bold" id="userLevel">1</h3>
+                </div>
+            </div>
+            <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden border border-white/10">
+                <div id="xpBar" class="h-full bg-gradient-to-r from-neonPurple to-tealHigh rounded-full transition-all duration-500" style="width: 25%;"></div>
+            </div>
+            <p class="text-xs text-gray-400 text-center mt-2" id="xpText">250 / 1000 XP to next level</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6 overflow-x-auto hide-scrollbar pb-2">
+            <button onclick="showAchievements('all')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all whitespace-nowrap active-filter">All</button>
+            <button onclick="showAchievements('unlocked')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all whitespace-nowrap">Unlocked</button>
+            <button onclick="showAchievements('locked')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all whitespace-nowrap">Locked</button>
+        </div>
+
+        <!-- Achievements Grid -->
+        <div id="achievementsGrid" class="grid grid-cols-3 gap-3 mb-8">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- Achievement Details -->
+        <h3 class="text-lg font-semibold mb-4">Recent Unlocks</h3>
+        <div id="recentUnlocks" class="flex flex-col gap-3">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Achievement Popup -->
+    <div id="achievementPopup" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-card rounded-2xl p-8 text-center max-w-sm">
+            <div class="mb-4 animate-pulse-glow">
+                <div id="popupIcon" class="text-6xl mb-4"></div>
+            </div>
+            <h2 id="popupTitle" class="text-2xl font-bold mb-2">Achievement Unlocked!</h2>
+            <p id="popupDesc" class="text-gray-300 mb-4 text-sm"></p>
+            <p id="popupXP" class="text-neonPurple font-bold mb-6">+100 XP</p>
+            <button onclick="closeAchievementPopup()" class="w-full bg-gradient-to-r from-neonPurple to-indigo-600 rounded-lg py-2 px-4 font-medium hover:shadow-[0_0_15px_rgba(176,38,255,0.4)]">Awesome!</button>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        const achievements = [
+            { id: 1, title: 'First Steps', desc: 'Complete your first task', icon: '👣', xp: 50, unlocked: true, date: new Date(Date.now() - 86400000) },
+            { id: 2, title: 'Perfect Attendance', desc: '100% attendance in a subject', icon: '✅', xp: 150, unlocked: true, date: new Date(Date.now() - 172800000) },
+            { id: 3, title: 'Night Owl', desc: 'Study after 10 PM', icon: '🌙', xp: 75, unlocked: false },
+            { id: 4, title: 'Marathon', desc: 'Study 3+ hours straight', icon: '🏃', xp: 200, unlocked: false },
+            { id: 5, title: 'Grade Master', desc: 'Score above 90% in an exam', icon: '🎓', xp: 250, unlocked: false },
+            { id: 6, title: 'Task Warrior', desc: 'Complete 50 goals', icon: '⚔️', xp: 300, unlocked: false },
+            { id: 7, title: 'Note Taker', desc: 'Create 10 study notes', icon: '📝', xp: 100, unlocked: true, date: new Date(Date.now() - 259200000) },
+            { id: 8, title: 'Consistency King', desc: '7-day study streak', icon: '👑', xp: 200, unlocked: false },
+            { id: 9, title: 'Resource Master', desc: 'Collect 20 learning resources', icon: '📚', xp: 150, unlocked: false },
+        ];
+
+        let currentFilter = 'all';
+
+        function getAchievements() {
+            let saved = localStorage.getItem('achievements');
+            if(saved) {
+                return JSON.parse(saved);
+            }
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+            return achievements;
+        }
+
+        function calculateXP() {
+            const achs = getAchievements();
+            return achs.filter(a => a.unlocked).reduce((sum, a) => sum + a.xp, 0);
+        }
+
+        function showAchievements(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('[onclick*="showAchievements"] button, button[onclick*="showAchievements"]').forEach(b => b.classList.remove('active-filter'));
+            event.target.classList.add('active-filter');
+            renderAchievements();
+        }
+
+        function renderAchievements() {
+            const achs = getAchievements();
+            let filtered = achs;
+
+            if(currentFilter === 'unlocked') filtered = achs.filter(a => a.unlocked);
+            else if(currentFilter === 'locked') filtered = achs.filter(a => !a.unlocked);
+
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = filtered.map((ach, idx) => `
+                <div class="flex flex-col items-center cursor-pointer group" onclick="showAchievementDetails('${ach.id}')">
+                    <div class="w-20 h-20 rounded-full flex items-center justify-center text-3xl border-2 transition-all group-hover:scale-110 
+                        ${ach.unlocked ? 'border-neonPurple bg-neonPurple/20 shadow-[0_0_15px_rgba(176,38,255,0.5)]' : 'border-white/10 bg-white/5 opacity-50 filter grayscale'}">
+                        ${ach.icon}
+                    </div>
+                    <p class="text-xs text-center mt-2 font-medium">${ach.title}</p>
+                    <p class="text-[10px] text-gray-500 text-center">${ach.xp} XP</p>
+                </div>
+            `).join('');
+
+            // Update XP and level
+            const totalXP = calculateXP();
+            const level = Math.floor(totalXP / 1000) + 1;
+            const xpInLevel = totalXP % 1000;
+            const xpPercent = (xpInLevel / 1000) * 100;
+
+            document.getElementById('totalXP').textContent = totalXP;
+            document.getElementById('userLevel').textContent = level;
+            document.getElementById('xpBar').style.width = xpPercent + '%';
+            document.getElementById('xpText').textContent = `${xpInLevel} / 1000 XP to next level`;
+
+            // Recent unlocks
+            const recent = achs.filter(a => a.unlocked && a.date).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
+            document.getElementById('recentUnlocks').innerHTML = recent.map(ach => `
+                <div class="glass-card rounded-xl p-4 flex items-center gap-4">
+                    <div class="text-4xl">${ach.icon}</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold">${ach.title}</h4>
+                        <p class="text-xs text-gray-400">${new Date(ach.date).toLocaleDateString()}</p>
+                    </div>
+                    <span class="text-neonPurple font-bold">+${ach.xp} XP</span>
+                </div>
+            `).join('');
+        }
+
+        function showAchievementDetails(id) {
+            const achs = getAchievements();
+            const ach = achs.find(a => a.id == id);
+            if(!ach) return;
+
+            const popup = document.getElementById('achievementPopup');
+            document.getElementById('popupIcon').textContent = ach.icon;
+            document.getElementById('popupTitle').textContent = ach.unlocked ? `${ach.title} - Unlocked!` : ach.title;
+            document.getElementById('popupDesc').textContent = ach.desc;
+            document.getElementById('popupXP').textContent = `${ach.xp} XP`;
+
+            if(!ach.unlocked) {
+                popup.querySelector('button').textContent = 'Keep Going!';
+            }
+
+            popup.classList.remove('hidden');
+        }
+
+        function closeAchievementPopup() {
+            document.getElementById('achievementPopup').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAchievements();
+        });
+
+        document.getElementById('achievementPopup').addEventListener('click', (e) => {
+            if(e.target.id === 'achievementPopup') closeAchievementPopup();
+        });
+    </script>
+</body>
+</html>

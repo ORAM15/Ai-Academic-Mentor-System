@@ -36,7 +36,7 @@
         <!-- Main Circular Graph -->
         <div class="glass-card rounded-3xl p-6 mb-8 flex flex-col items-center relative animate-fade-in-up">
             <div class="absolute top-4 right-4 bg-white/10 px-3 py-1 rounded-full text-xs font-medium border border-white/5 flex items-center gap-1">
-                <i class="fa-solid fa-wand-magic-sparkles text-neonPurple"></i> Trend Prediction
+                <i class="fa-solid fa-wand-magic-sparkles text-neonPurple"></i> <span id="predictionMode">Overall Trend</span>
             </div>
             
             <div class="relative w-48 h-48 mt-4 mb-2 flex items-center justify-center">
@@ -53,13 +53,15 @@
                 </svg>
                 <div class="absolute flex flex-col items-center justify-center text-center">
                     <span class="text-4xl font-bold text-gradient" id="overallPerc">0%</span>
-                    <span class="text-xs text-gray-400 mt-1">Overall Present</span>
+                    <span class="text-xs text-gray-400 mt-1" id="percLabel">Overall Present</span>
                 </div>
             </div>
 
             <p class="text-center text-sm text-gray-300 px-4 mt-2">
                 "Maintaining this rate, your expected attendance by end of semester is <span class="text-neonPurple font-semibold" id="predictedPerc">0%</span>."
             </p>
+            
+            <p class="text-center text-xs text-gray-400 px-4 mt-1" id="selectedSubjectHint"></p>
             
             <!-- Slider -->
             <div class="w-full mt-6">
@@ -87,17 +89,222 @@
         </div>
 
         <!-- Subject Wise List -->
-        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.1s;">Subject-wise Details</h3>
+        <h3 class="text-lg font-semibold mb-4 animate-fade-in-up" style="animation-delay: 0.1s;">Subject-wise Details (Click for Prediction)</h3>
         <div class="flex flex-col gap-4 animate-fade-in-up" style="animation-delay: 0.2s;" id="subjectsList">
             <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Subject Prediction Modal -->
+    <div id="predictionModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-card rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-lg font-bold" id="modalTitle">Subject Prediction</h2>
+                    <p class="text-xs text-gray-400" id="modalSubject">Loading...</p>
+                </div>
+                <button onclick="closePredictionModal()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Current Stats -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-white/5 rounded-lg p-3">
+                    <p class="text-xs text-gray-400 mb-1">Current Attendance</p>
+                    <p class="text-2xl font-bold text-tealHigh" id="modalCurrentPerc">0%</p>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3">
+                    <p class="text-xs text-gray-400 mb-1">Classes Attended</p>
+                    <p class="text-2xl font-bold text-neonPurple" id="modalAttended">0/0</p>
+                </div>
+            </div>
+
+            <!-- Prediction Scenarios -->
+            <h3 class="font-semibold mb-3 text-sm">Prediction Scenarios</h3>
+            <div class="space-y-2 mb-6">
+                <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium">Attend all next 5 classes</span>
+                        <span class="text-tealHigh font-bold" id="predBestCase">85%</span>
+                    </div>
+                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                        <div class="h-full bg-green-500 rounded-full" id="bestCaseBar" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium">Current trajectory (75% attendance)</span>
+                        <span class="text-yellow-400 font-bold" id="predCurrentCase">78%</span>
+                    </div>
+                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                        <div class="h-full bg-yellow-500 rounded-full" id="currentCaseBar" style="width: 78%;"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium">Miss next 5 classes</span>
+                        <span class="text-red-500 font-bold" id="predWorstCase">68%</span>
+                    </div>
+                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                        <div class="h-full bg-red-500 rounded-full" id="worstCaseBar" style="width: 68%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Status -->
+            <div class="bg-white/5 rounded-lg p-3 border border-white/10 mb-4">
+                <p class="text-xs text-gray-400 mb-2">Status</p>
+                <p class="text-sm text-white" id="predictionStatus">Good! Keep attending.</p>
+            </div>
+
+            <button onclick="closePredictionModal()" class="w-full bg-gradient-to-r from-neonPurple to-indigo-600 rounded-lg py-2 px-4 text-sm font-medium hover:shadow-[0_0_15px_rgba(176,38,255,0.4)] transition-all">
+                Close
+            </button>
         </div>
     </div>
 
     <!-- Scripts -->
     <script src="js/api.js"></script>
     <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
     <script src="js/main.js"></script>
     <script>
+        let allSubjectsData = [];
+        let selectedSubjectIndex = -1; // -1 means overall
+        let currentOverallAttendance = 0;
+        let circle, circumference, slider, feedback, overallText;
+
+        function closePredictionModal() {
+            document.getElementById('predictionModal').classList.add('hidden');
+        }
+
+        function updateCircleAndPrediction(percentage) {
+            percentage = Math.max(0, Math.min(100, percentage));
+            const offset = circumference - (percentage / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            overallText.textContent = `${percentage.toFixed(1)}%`;
+        }
+
+        function calculatePredictionForSubject(subjectIndex, sliderValue) {
+            const sub = allSubjectsData[subjectIndex];
+            const classesLeft = 10;
+            const currentPerc = sub.percentage;
+            
+            // Adjust based on slider value
+            let adjustedAttended = sub.attended + sliderValue;
+            let adjustedTotal = sub.total + 5;
+            
+            const newPerc = (adjustedAttended / adjustedTotal) * 100;
+            return Math.max(0, Math.min(100, newPerc));
+        }
+
+        function calculatePredictionOverall(sliderValue) {
+            const classesLeft = 10;
+            const classesAlreadyCompleted = Math.round((50 * currentOverallAttendance) / 100);
+            let expectedClasses = classesAlreadyCompleted + sliderValue + (5 * 0.75);
+            const predictedPerc = (expectedClasses / 50) * 100;
+            return Math.max(0, Math.min(100, predictedPerc));
+        }
+
+        function updateSliderPrediction(sliderValue) {
+            if(selectedSubjectIndex === -1) {
+                // Overall mode
+                const newPerc = currentOverallAttendance + (sliderValue * 1.5);
+                const finalPerc = Math.max(0, Math.min(100, newPerc));
+                updateCircleAndPrediction(finalPerc);
+
+                if(sliderValue === 0) feedback.textContent = "Current Trajectory";
+                else if(sliderValue > 0) feedback.textContent = `If you attend next ${sliderValue} classes`;
+                else feedback.textContent = `If you miss next ${Math.abs(sliderValue)} classes`;
+            } else {
+                // Subject-specific mode
+                const finalPerc = calculatePredictionForSubject(selectedSubjectIndex, sliderValue);
+                updateCircleAndPrediction(finalPerc);
+
+                const sub = allSubjectsData[selectedSubjectIndex];
+                if(sliderValue === 0) feedback.textContent = "Current trajectory for " + (sub.name || sub.subject);
+                else if(sliderValue > 0) feedback.textContent = `If you attend next ${sliderValue} classes in ${sub.name || sub.subject}`;
+                else feedback.textContent = `If you miss next ${Math.abs(sliderValue)} classes in ${sub.name || sub.subject}`;
+            }
+        }
+
+        function showSubjectPrediction(subjectIndex) {
+            // Ensure we have valid data
+            if(!allSubjectsData || allSubjectsData.length === 0) {
+                console.error("Subject data not available");
+                return;
+            }
+            
+            selectedSubjectIndex = subjectIndex;
+            const sub = allSubjectsData[subjectIndex];
+            
+            if(!sub) {
+                console.error("Subject not found at index:", subjectIndex);
+                return;
+            }
+
+            // Update main circle
+            document.getElementById('predictionMode').textContent = sub.name || sub.subject;
+            document.getElementById('percLabel').textContent = 'Subject Attendance';
+            document.getElementById('selectedSubjectHint').textContent = `Click to see detailed predictions for ${sub.name || sub.subject}`;
+            
+            // Update circle
+            updateCircleAndPrediction(sub.percentage);
+            
+            // Update slider
+            slider.value = 0;
+            slider.dispatchEvent(new Event('input'));
+            
+            // Show modal
+            const modal = document.getElementById('predictionModal');
+            
+            document.getElementById('modalTitle').textContent = 'Detailed Prediction';
+            document.getElementById('modalSubject').textContent = sub.name || sub.subject;
+            
+            // Current stats - using actual values from data
+            const currentPercentage = Math.round((sub.attended / sub.total) * 100);
+            document.getElementById('modalCurrentPerc').textContent = currentPercentage + '%';
+            document.getElementById('modalAttended').textContent = sub.attended + '/' + sub.total;
+
+            // Calculate predictions based on actual attended/total
+            const classesLeft = 10;
+            const bestCase = Math.min(100, ((sub.attended + classesLeft) / (sub.total + classesLeft)) * 100);
+            const currentCase = Math.min(100, ((sub.attended + (classesLeft * 0.75)) / (sub.total + classesLeft)) * 100);
+            const worstCase = Math.min(100, (sub.attended / (sub.total + classesLeft)) * 100);
+
+            document.getElementById('predBestCase').textContent = bestCase.toFixed(1) + '%';
+            document.getElementById('predCurrentCase').textContent = currentCase.toFixed(1) + '%';
+            document.getElementById('predWorstCase').textContent = worstCase.toFixed(1) + '%';
+
+            document.getElementById('bestCaseBar').style.width = bestCase + '%';
+            document.getElementById('currentCaseBar').style.width = currentCase + '%';
+            document.getElementById('worstCaseBar').style.width = worstCase + '%';
+
+            // Status message based on current percentage
+            let status = '✅ Good! Keep attending.';
+            if(currentPercentage < 75) {
+                status = '🚨 Critical! You must attend upcoming classes to meet attendance requirement.';
+            } else if(currentPercentage < 85) {
+                status = '⚠️ Warning! Attend more classes to maintain good standing.';
+            }
+            document.getElementById('predictionStatus').textContent = status;
+
+            modal.classList.remove('hidden');
+        }
+
+        function clearSubjectSelection() {
+            selectedSubjectIndex = -1;
+            document.getElementById('predictionMode').textContent = 'Overall Trend';
+            document.getElementById('percLabel').textContent = 'Overall Present';
+            document.getElementById('selectedSubjectHint').textContent = '';
+            updateCircleAndPrediction(currentOverallAttendance);
+            slider.value = 0;
+            slider.dispatchEvent(new Event('input'));
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const isDemo = localStorage.getItem('demoMode') === 'true';
             
@@ -114,46 +321,40 @@
                  }
             }
 
-            const currentOverall = parseFloat(data.overall);
+            allSubjectsData = data.subjects;
+            currentOverallAttendance = parseFloat(data.overall);
             
-            const circle = document.getElementById('attendanceCircle');
-            const circumference = 2 * Math.PI * 45; // ~282.7
-            
-            function updateCircle(percentage) {
-                percentage = Math.max(0, Math.min(100, percentage));
-                const offset = circumference - (percentage / 100) * circumference;
-                circle.style.strokeDashoffset = offset;
-            }
+            circle = document.getElementById('attendanceCircle');
+            circumference = 2 * Math.PI * 45;
             
             circle.style.strokeDasharray = `${circumference}`;
-            setTimeout(() => { updateCircle(currentOverall); }, 100);
+            setTimeout(() => { updateCircleAndPrediction(currentOverallAttendance); }, 100);
             
-            document.getElementById('overallPerc').textContent = `${currentOverall}%`;
-            document.getElementById('predictedPerc').textContent = `${(currentOverall + 2).toFixed(1)}%`;
+            // Calculate better trend prediction
+            const classesLeft = 10;
+            const attendanceRate = 0.75;
+            const totalClasses = 50;
+            const classesAlreadyCompleted = Math.round((totalClasses * currentOverallAttendance) / 100);
+            const expectedClasses = classesAlreadyCompleted + (classesLeft * attendanceRate);
+            const predictedPerc = Math.min(100, (expectedClasses / totalClasses) * 100);
+            
+            document.getElementById('predictedPerc').textContent = `${predictedPerc.toFixed(1)}%`;
 
-            // Slider Logic
-            const slider = document.getElementById('attendanceSlider');
-            const feedback = document.getElementById('sliderFeedback');
-            const overallText = document.getElementById('overallPerc');
+            // Slider Setup
+            slider = document.getElementById('attendanceSlider');
+            feedback = document.getElementById('sliderFeedback');
+            overallText = document.getElementById('overallPerc');
             
             slider.addEventListener('input', (e) => {
                 const val = parseInt(e.target.value);
-                const newPerc = currentOverall + (val * 1.5); // Simple math for mock prediction
-                const finalPerc = Math.max(0, Math.min(100, newPerc));
-                
-                overallText.textContent = `${finalPerc.toFixed(1)}%`;
-                updateCircle(finalPerc);
-
-                if(val === 0) feedback.textContent = "Current Trajectory";
-                else if(val > 0) feedback.textContent = `Prediction if you attend next ${val} classes`;
-                else feedback.textContent = `Prediction if you miss next ${Math.abs(val)} classes`;
+                updateSliderPrediction(val);
             });
 
-            // Populate Subjects
+            // Populate Subjects - Clickable
             const list = document.getElementById('subjectsList');
             list.innerHTML = '';
             
-            data.subjects.forEach(sub => {
+            data.subjects.forEach((sub, index) => {
                 let barColor = 'bg-green-500';
                 let iconColor = 'text-green-500 bg-green-500/10 border-green-500/20 shadow-[0_0_10px_rgba(16,185,129,0.3)]';
                 let iconClass = 'fa-check';
@@ -168,25 +369,39 @@
                     iconClass = 'fa-xmark';
                 }
 
-                list.innerHTML += `
-                <div class="glass-card rounded-xl p-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full border flex items-center justify-center ${iconColor}">
-                                <i class="fa-solid ${iconClass} text-xs"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-semibold">${sub.name || sub.subject}</h4>
-                                <p class="text-xs text-gray-400">${sub.attended}/${sub.total} Classes Attended</p>
-                            </div>
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-xl p-4 cursor-pointer hover:bg-white/10 transition-all active:scale-95';
+                card.setAttribute('data-subject-index', index);
+                card.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-3 flex-1">
+                        <div class="w-8 h-8 rounded-full border flex items-center justify-center ${iconColor}">
+                            <i class="fa-solid ${iconClass} text-xs"></i>
                         </div>
-                        <span class="text-sm font-bold min-w-[40px] text-right ${sub.status === 'critical' ? 'text-red-500' : ''}">${sub.percentage}%</span>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-semibold">${sub.name || sub.subject}</h4>
+                            <p class="text-xs text-gray-400">${sub.attended}/${sub.total} Classes</p>
+                        </div>
                     </div>
-                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                        <div class="h-full ${barColor} rounded-full" style="width: ${sub.percentage}%;"></div>
+                    <div class="flex flex-col items-end">
+                        <span class="text-sm font-bold min-w-[40px] text-right ${sub.status === 'critical' ? 'text-red-500' : ''}">${sub.percentage}%</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-neonPurple mt-1"></i>
                     </div>
                 </div>
+                <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                    <div class="h-full ${barColor} rounded-full" style="width: ${sub.percentage}%;"></div>
+                </div>
                 `;
+                card.addEventListener('click', () => {
+                    const idx = parseInt(card.getAttribute('data-subject-index'));
+                    showSubjectPrediction(idx);
+                });
+                list.appendChild(card);
+            });
+
+            // Modal close handlers
+            document.getElementById('predictionModal').addEventListener('click', (e) => {
+                if(e.target.id === 'predictionModal') closePredictionModal();
             });
         });
     </script>

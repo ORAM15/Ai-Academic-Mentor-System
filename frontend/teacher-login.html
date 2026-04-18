@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Teacher Login - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        purpleDark: '#110a1f',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-hidden">
+    <div class="fixed top-[20%] left-[-20%] w-96 h-96 bg-neonPurple rounded-full mix-blend-screen filter blur-[150px] opacity-20 z-0 pointer-events-none"></div>
+    <div class="fixed bottom-[-20%] right-[-20%] w-96 h-96 bg-tealHigh rounded-full mix-blend-screen filter blur-[150px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 min-h-screen flex items-center justify-center px-6">
+        <div class="w-full max-w-md">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-neonPurple to-tealHigh rounded-2xl mb-4">
+                    <i class="fa-solid fa-chalkboard-teacher text-2xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Teacher Portal</h1>
+                <p class="text-gray-400">Access your administrative dashboard</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="glass-card rounded-3xl p-8">
+                <form id="teacherLoginForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Teacher ID</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-id-badge absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input
+                                type="text"
+                                id="teacherId"
+                                required
+                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 pl-10 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-neonPurple transition-all"
+                                placeholder="Enter your teacher ID"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Password</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input
+                                type="password"
+                                id="password"
+                                required
+                                class="w-full bg-white/10 border border-white/20 rounded-lg py-3 pl-10 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-neonPurple transition-all"
+                                placeholder="Enter your password"
+                            >
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="w-full bg-gradient-to-r from-neonPurple to-tealHigh rounded-lg py-3 px-4 text-white font-semibold hover:shadow-[0_0_20px_rgba(176,38,255,0.4)] transition-all duration-300 transform hover:scale-105"
+                    >
+                        <i class="fa-solid fa-sign-in-alt mr-2"></i>Login to Dashboard
+                    </button>
+                </form>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg hidden">
+                    <p class="text-red-400 text-sm text-center"></p>
+                </div>
+
+                <!-- Demo Credentials -->
+                <div class="mt-6 p-4 bg-white/5 border border-white/10 rounded-lg">
+                    <p class="text-xs text-gray-400 mb-2 text-center">Demo Credentials</p>
+                    <div class="text-center space-y-1">
+                        <p class="text-sm text-tealHigh font-mono">ID: T001</p>
+                        <p class="text-sm text-tealHigh font-mono">Password: teacher123</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button id="demoTeacherBtn" type="button" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium py-3 rounded-xl transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt text-tealHigh"></i> Continue as Demo Local
+                    </button>
+                </div>
+
+                <!-- Back to Student Login -->
+                <div class="mt-6 text-center">
+                    <a href="/login.html" class="text-neonPurple hover:text-tealHigh transition-colors text-sm">
+                        <i class="fa-solid fa-arrow-left mr-1"></i>Back to Student Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/toast.js"></script>
+    <script>
+        document.getElementById('teacherLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const teacherId = document.getElementById('teacherId').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = errorDiv.querySelector('p');
+
+            // Clear previous errors
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await window.api.teacherLogin(teacherId, password);
+
+                // Store token
+                localStorage.setItem('teacherToken', response.token);
+                localStorage.setItem('teacherData', JSON.stringify(response));
+
+                // Show success message
+                if(window.toast) {
+                    window.toast.success('Login successful! Redirecting...');
+                }
+
+                // Redirect to admin dashboard
+                setTimeout(() => {
+                    window.location.href = '/admin.html';
+                }, 1000);
+
+            } catch (error) {
+                console.error('Login failed:', error);
+
+                if (teacherId === 'T001' && password === 'teacher123') {
+                    localStorage.setItem('demoTeacherMode', 'true');
+                    localStorage.setItem('teacherToken', 'demo-token');
+                    localStorage.setItem('teacherData', JSON.stringify({ teacherId: 'T001', name: 'Demo Teacher', email: 'demo@mentor.local' }));
+                    window.location.href = '/admin.html';
+                    return;
+                }
+
+                errorText.textContent = error.message || 'Login failed. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('demoTeacherBtn').addEventListener('click', () => {
+            localStorage.setItem('demoTeacherMode', 'true');
+            localStorage.setItem('teacherToken', 'demo-token');
+            localStorage.setItem('teacherData', JSON.stringify({ teacherId: 'T001', name: 'Demo Teacher', email: 'demo@mentor.local' }));
+            window.location.href = '/admin.html';
+        });
+
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('teacherToken');
+            if(token) {
+                window.location.href = '/admin.html';
+            }
+        });
+    </script>
+</body>
+</html>

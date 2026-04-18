@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources - Virtual Mentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deep: '#0a0a0a',
+                        neonPurple: '#b026ff',
+                        tealHigh: '#00f0ff',
+                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-deep text-white min-h-screen relative font-sans overflow-x-hidden pb-24">
+    <div class="fixed top-[-20%] right-[-10%] w-72 h-72 bg-neonPurple rounded-full mix-blend-screen filter blur-[120px] opacity-20 z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 px-6 pt-10">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold tracking-wide">Learning Resources</h1>
+                <p class="text-sm text-gray-400 mt-1">Videos, notes, and materials</p>
+            </div>
+            <button onclick="openResourceModal()" class="w-10 h-10 rounded-full bg-gradient-to-r from-neonPurple to-indigo-600 flex items-center justify-center hover:shadow-[0_0_15px_rgba(176,38,255,0.4)]">
+                <i class="fa-solid fa-plus text-sm"></i>
+            </button>
+        </header>
+
+        <!-- Filter Tabs -->
+        <div class="flex gap-2 mb-6 overflow-x-auto hide-scrollbar pb-2">
+            <button onclick="filterResources('all')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all whitespace-nowrap active-filter">All</button>
+            <button onclick="filterResources('video')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all whitespace-nowrap">Videos</button>
+            <button onclick="filterResources('document')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all whitespace-nowrap">Documents</button>
+            <button onclick="filterResources('link')" class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/20 hover:bg-neonPurple/20 transition-all whitespace-nowrap">Links</button>
+        </div>
+
+        <!-- Resources Grid -->
+        <div id="resourcesList" class="flex flex-col gap-3">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Add Resource Modal -->
+    <div id="resourceModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-card rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold">Add Resource</h2>
+                <button onclick="closeResourceModal()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="resourceForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Subject</label>
+                    <select id="resourceSubject" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white" required>
+                        <option value="">Select a subject</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Type</label>
+                    <select id="resourceType" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white" required>
+                        <option value="video">Video</option>
+                        <option value="document">Document / PDF</option>
+                        <option value="link">External Link</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Title</label>
+                    <input type="text" id="resourceTitle" placeholder="e.g., REST API Fundamentals" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white placeholder-gray-600" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">URL / Link</label>
+                    <input type="url" id="resourceUrl" placeholder="https://example.com" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white placeholder-gray-600" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2">Description</label>
+                    <textarea id="resourceDesc" placeholder="Optional description..." rows="3" class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neonPurple/50 text-white placeholder-gray-600 resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeResourceModal()" class="flex-1 bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm font-medium hover:bg-white/10">Cancel</button>
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-neonPurple to-indigo-600 rounded-lg py-2 px-4 text-sm font-medium hover:shadow-[0_0_15px_rgba(176,38,255,0.4)]">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        let resources = [];
+        let currentFilter = 'all';
+
+        function openResourceModal() {
+            document.getElementById('resourceModal').classList.remove('hidden');
+            populateSubjectSelect();
+        }
+
+        function closeResourceModal() {
+            document.getElementById('resourceModal').classList.add('hidden');
+            document.getElementById('resourceForm').reset();
+        }
+
+        function populateSubjectSelect() {
+            const select = document.getElementById('resourceSubject');
+            if(!select.querySelector('option[value!=""]')) {
+                window.appData.subjects.forEach(sub => {
+                    const opt = document.createElement('option');
+                    opt.value = sub.name;
+                    opt.textContent = sub.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function filterResources(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('[onclick*="filterResources"]').forEach(btn => btn.classList.remove('active-filter'));
+            event.target.classList.add('active-filter');
+            renderResources();
+        }
+
+        function renderResources() {
+            const list = document.getElementById('resourcesList');
+            let filtered = resources;
+
+            if(currentFilter !== 'all') {
+                filtered = resources.filter(r => r.type === currentFilter);
+            }
+
+            if(filtered.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center text-sm py-10">No resources yet. Add one to get started!</p>';
+                return;
+            }
+
+            list.innerHTML = filtered.map((res, idx) => {
+                let icon, color;
+                if(res.type === 'video') {
+                    icon = 'fa-video';
+                    color = 'text-red-400';
+                } else if(res.type === 'document') {
+                    icon = 'fa-file-pdf';
+                    color = 'text-orange-400';
+                } else {
+                    icon = 'fa-link';
+                    color = 'text-blue-400';
+                }
+
+                return `
+                    <div class="glass-card rounded-xl p-4 animate-slide-in">
+                        <div class="flex gap-3">
+                            <div class="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center shrink-0 ${color}">
+                                <i class="fa-solid ${icon}"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-semibold text-white truncate">${res.title}</h3>
+                                <p class="text-xs text-gray-400 mb-1">${res.subject}</p>
+                                ${res.desc ? `<p class="text-xs text-gray-300 line-clamp-2">${res.desc}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <a href="${res.url}" target="_blank" class="flex-1 bg-neonPurple/20 border border-neonPurple/50 rounded-lg py-2 px-3 text-xs font-medium text-center hover:bg-neonPurple/30 transition-all">
+                                Open
+                            </a>
+                            <button onclick="deleteResource(${idx})" class="bg-red-500/20 border border-red-500/50 rounded-lg py-2 px-3 text-xs font-medium hover:bg-red-500/30 transition-all">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteResource(idx) {
+            if(confirm('Delete this resource?')) {
+                resources.splice(idx, 1);
+                localStorage.setItem('resources', JSON.stringify(resources));
+                renderResources();
+            }
+        }
+
+        document.getElementById('resourceForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newResource = {
+                id: Date.now(),
+                subject: document.getElementById('resourceSubject').value,
+                type: document.getElementById('resourceType').value,
+                title: document.getElementById('resourceTitle').value,
+                url: document.getElementById('resourceUrl').value,
+                desc: document.getElementById('resourceDesc').value,
+                date: new Date().toISOString()
+            };
+            resources.unshift(newResource);
+            localStorage.setItem('resources', JSON.stringify(resources));
+            renderResources();
+            closeResourceModal();
+            window.toast && window.toast.success('✨ Resource added successfully!');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('resources');
+            if(saved) {
+                resources = JSON.parse(saved);
+            } else {
+                resources = [
+                    { id: 1, subject: 'MEAN Fullstack Development', type: 'video', title: 'REST API Complete Tutorial', url: 'https://www.youtube.com/watch?v=j1gU2oKHc6c', desc: 'Comprehensive REST API guide', date: new Date().toISOString() },
+                    { id: 2, subject: 'DevOps', type: 'document', title: 'Docker Cheatsheet', url: 'https://docs.docker.com/', desc: 'Quick Docker commands reference', date: new Date().toISOString() },
+                    { id: 3, subject: 'Introduction to Machine Learning', type: 'link', title: 'Kaggle ML Datasets', url: 'https://www.kaggle.com/datasets', desc: 'Free ML datasets for practice', date: new Date().toISOString() },
+                ];
+                localStorage.setItem('resources', JSON.stringify(resources));
+            }
+            renderResources();
+        });
+
+        document.getElementById('resourceModal').addEventListener('click', (e) => {
+            if(e.target.id === 'resourceModal') closeResourceModal();
+        });
+    </script>
+</body>
+</html>
